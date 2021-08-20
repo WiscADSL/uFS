@@ -1,0 +1,12 @@
+*.pyc
+*_log
+log/*
+./script_template
+bumble_*
+log_*
+logs/
+./tmplt_*.sh
+*tmplt_*.sh
+.lm_prep_type
+DATA_*
+!log_utils
