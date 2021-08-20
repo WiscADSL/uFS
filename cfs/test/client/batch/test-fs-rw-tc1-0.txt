@@ -1,0 +1,20 @@
+create test_f_0
+write %1 RPT A 4096
+write %1 RPT B 4096
+write %1 RPT C 4096
+write %1 RPT D 1024
+write %1 RPT E 1024
+write %1 RPT F 1024
+write %1 RPT G 1024
+write %1 RPT H 1000
+write %1 RPT I 1000
+write %1 RPT J 1000
+write %1 RPT K 1000
+write %1 RPT L 4000
+write %1 RPT M 97
+pwrite %1 RPT a 4096 1000
+pwrite %1 RPT b 5096 1000
+pwrite %1 RPT c 6096 2096
+pwrite %1 RPT d 8192 100
+pwrite %1 RPT e 8492 100
+close %1

@@ -1,0 +1,53 @@
+// Defines feature macro functions that are used by the rest of the source code.
+// For safety - source code must rely on the feature macro functions using if
+// FOO() rather than ifdef FOO.
+
+#ifndef CFS_INCLUDE_FEATURE_MACROS_H_
+#define CFS_INCLUDE_FEATURE_MACROS_H_
+
+// Journal related features
+#define CFS_NO_JOURNAL 1
+#define CFS_GLOBAL_JOURNAL 2
+#define CFS_LOCAL_JOURNAL 3
+
+// provided at compile time by the user
+#ifndef CFS_JOURNAL_TYPE
+#error "CFS_JOURNAL_TYPE not defined"
+#endif
+
+// The following defines CFS_JOURNAL features such as
+#define CFS_JOURNAL(X) CFS_JOURNAL_PRIVATE_##X()
+
+// CFS_JOURNAL(NO_JOURNAL)
+#define CFS_JOURNAL_PRIVATE_NO_JOURNAL() (CFS_JOURNAL_TYPE == CFS_NO_JOURNAL)
+// CFS_JOURNAL(GLOBAL_JOURNAL)
+#define CFS_JOURNAL_PRIVATE_GLOBAL_JOURNAL() \
+  (CFS_JOURNAL_TYPE == CFS_GLOBAL_JOURNAL)
+// CFS_JOURNAL(LOCAL_JOURNAL)
+#define CFS_JOURNAL_PRIVATE_LOCAL_JOURNAL() \
+  (CFS_JOURNAL_TYPE == CFS_LOCAL_JOURNAL)
+
+// CFS_JOURNAL(OFF)
+#define CFS_JOURNAL_PRIVATE_OFF() (CFS_JOURNAL_PRIVATE_NO_JOURNAL())
+// CFS_JOURNAL(ON)
+#define CFS_JOURNAL_PRIVATE_ON() (!CFS_JOURNAL_PRIVATE_OFF())
+
+// CFS_JOURNAL(PERF_METRICS)
+#ifdef CFS_JOURNAL_PERF_METRICS
+#define CFS_JOURNAL_PRIVATE_PERF_METRICS() 1
+#else
+#define CFS_JOURNAL_PRIVATE_PERF_METRICS() 0
+#endif
+
+#if CFS_JOURNAL(PERF_METRICS) && CFS_JOURNAL(NO_JOURNAL)
+#error "Cannot have JOURNAL_PERF_METRICS with NO_JOURNAL"
+#endif
+
+// CFS_JOURNAL(CHECKPOINTING)
+#ifdef CFS_JOURNAL_DISABLE_CHKPT
+#define CFS_JOURNAL_PRIVATE_CHECKPOINTING() 0
+#else
+#define CFS_JOURNAL_PRIVATE_CHECKPOINTING() 1
+#endif
+
+#endif  // CFS_INCLUDE_FEATURE_MACROS_H_

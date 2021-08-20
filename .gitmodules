@@ -1,0 +1,23 @@
+[submodule "cfs/lib/cxxopts"]
+	path = cfs/lib/cxxopts
+	url = https://github.com/jarro2783/cxxopts.git
+[submodule "cfs/lib/Catch2"]
+	path = cfs/lib/Catch2
+	url = https://github.com/jliu9/Catch2.git
+	branch = in-use
+[submodule "cfs/lib/pcm"]
+	path = cfs/lib/pcm
+	url = https://github.com/jingliu9/pcm.git
+	branch = fsp
+[submodule "cfs/lib/userspace-rcu"]
+	path = cfs/lib/userspace-rcu
+	url = https://github.com/urcu/userspace-rcu.git
+	branch = stable-0.12
+[submodule "cfs/lib/abseil-cpp"]
+	path = cfs/lib/abseil-cpp
+	url = https://github.com/abseil/abseil-cpp.git
+	branch = lts_2020_09_23
+[submodule "cfs/lib/json"]
+	path = cfs/lib/json
+	url = https://github.com/jingliu9/json.git
+	branch = ufs

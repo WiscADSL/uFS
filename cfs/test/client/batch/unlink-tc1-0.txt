@@ -1,0 +1,14 @@
+## unlink test case 1 - step 0
+##
+mkdir sub
+create sub/t0
+write %4 RPT A 100
+close %4
+unlink sub/t0
+stat sub/t0 st_size
+stat sub/t0 st_blocks
+## t1 used to test unlink after reboot FSP
+create sub/t1
+write %11 RPT B 100
+close %11
+stat sub/t1 st_size

@@ -1,0 +1,4 @@
+## unlink test case 1 - step 2
+## can create the same file again
+stat sub/t0 st_size
+stat sub/t1 st_size

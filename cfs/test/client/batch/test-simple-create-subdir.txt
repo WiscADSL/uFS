@@ -1,0 +1,11 @@
+create test_file_1
+write %1% test_string
+mkdir subdir
+create subdir/sub_file
+close %1%
+open test_file_1
+rename test_file_1 test_file_2
+write %4% %RANDSTRING(12)%
+close %4%
+write %6% woahwoah
+close %6%

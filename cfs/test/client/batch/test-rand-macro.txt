@@ -1,0 +1,4 @@
+create %RANDSTRING(13)%
+write %1% %RANDSTRING(20)%
+read %1% %RANDUINT(3)%
+close %1%

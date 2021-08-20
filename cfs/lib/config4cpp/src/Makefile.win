@@ -1,0 +1,135 @@
+PROJECT_ROOT=..
+!include "$(PROJECT_ROOT)\Makefile.win.inc"
+
+PUB_INC_FILES= \
+		$(INC_DIR)\config4cpp\Configuration.h \
+		$(INC_DIR)\config4cpp\ConfigurationException.h \
+		$(INC_DIR)\config4cpp\StringBuffer.h \
+		$(INC_DIR)\config4cpp\StringVector.h \
+		$(INC_DIR)\config4cpp\SchemaValidator.h \
+		$(INC_DIR)\config4cpp\namespace.h
+
+LIB_HDR_FILES	= \
+		$(PUB_INC_FILES) \
+		SchemaLex.h \
+		SchemaParser.h \
+		SchemaRuleInfo.h \
+		MBChar.h \
+		platform.h \
+		ConfigurationImpl.h \
+		UidIdentifierProcessor.h \
+		UidIdentifierDummyProcessor.h \
+		util.h \
+		ConfigParser.h \
+		ConfigScope.h \
+		ConfigScopeEntry.h \
+		ConfigItem.h \
+		LexToken.h \
+		LexBase.h \
+		ConfigLex.h \
+		SchemaTypeBoolean.h \
+		SchemaTypeDummy.h \
+		SchemaTypeDurationMicroseconds.h \
+		SchemaTypeDurationMilliseconds.h \
+		SchemaTypeDurationSeconds.h \
+		SchemaTypeEnum.h \
+		SchemaTypeFloat.h \
+		SchemaTypeFloatWithUnits.h \
+		SchemaTypeInt.h \
+		SchemaTypeIntWithUnits.h \
+		SchemaTypeList.h \
+		SchemaTypeMemorySizeBytes.h \
+		SchemaTypeMemorySizeKB.h \
+		SchemaTypeMemorySizeMB.h \
+		SchemaTypeScope.h \
+		SchemaTypeString.h \
+		SchemaTypeTable.h \
+		SchemaTypeTuple.h \
+		SchemaTypeTypedef.h \
+		SchemaTypeUnitsWithFloat.h \
+		SchemaTypeUnitsWithInt.h
+
+
+LIB_OBJ_FILES	= \
+		SchemaLex.obj \
+		SchemaParser.obj \
+		MBChar.obj \
+		SchemaValidator.obj \
+		platform.obj \
+		util.obj \
+		Configuration.obj \
+		DefaultSecurity.obj \
+		DefaultSecurityConfiguration.obj \
+		ConfigurationException.obj \
+		ConfigurationImpl.obj \
+		ConfigParser.obj \
+		UidIdentifierProcessor.obj \
+		ConfigScope.obj \
+		ConfigScopeEntry.obj \
+		ConfigItem.obj \
+		LexToken.obj \
+		LexBase.obj \
+		ConfigLex.obj \
+		StringBuffer.obj \
+		StringVector.obj \
+		SchemaType.obj \
+		SchemaTypeBoolean.obj \
+		SchemaTypeDurationMicroseconds.obj \
+		SchemaTypeDurationMilliseconds.obj \
+		SchemaTypeDurationSeconds.obj \
+		SchemaTypeEnum.obj \
+		SchemaTypeFloat.obj \
+		SchemaTypeFloatWithUnits.obj \
+		SchemaTypeInt.obj \
+		SchemaTypeIntWithUnits.obj \
+		SchemaTypeMemorySizeBytes.obj \
+		SchemaTypeMemorySizeKB.obj \
+		SchemaTypeMemorySizeMB.obj \
+		SchemaTypeScope.obj \
+		SchemaTypeString.obj \
+		SchemaTypeUnitsWithFloat.obj \
+		SchemaTypeUnitsWithInt.obj \
+		SchemaTypeList.obj \
+		SchemaTypeTable.obj \
+		SchemaTypeTuple.obj \
+		SchemaTypeTypedef.obj
+
+
+all:		config4cpp.exe config2cpp.exe config2cpp-nocheck.exe
+
+$(LIB_CONFIG4CPP):	$(LIB_OBJ_FILES)
+	LIB /out:$(LIB_CONFIG4CPP) $(LIB_OBJ_FILES)
+	copy $(LIB_CONFIG4CPP) $(LIB_DIR)
+
+DefaultSecurity.cpp DefaultSecurity.h: DefaultSecurity.cfg config2cpp-nocheck.exe
+	.\config2cpp-nocheck.exe -cfg DefaultSecurity.cfg -class DefaultSecurity \
+			-namespace CONFIG4CPP_NAMESPACE
+
+DefaultSecurityConfiguration.obj: DefaultSecurityConfiguration.cpp \
+					DefaultSecurityConfiguration.h \
+					DefaultSecurity.h
+
+config2cpp.exe:	config2cpp-main.obj Config2Cpp.obj $(LIB_CONFIG4CPP)
+		LINK /out:config2cpp.exe config2cpp-main.obj Config2Cpp.obj \
+			$(LIB_CONFIG4CPP)
+		copy config2cpp.exe $(BIN_DIR)
+
+config2cpp-nocheck.exe:	config2cpp-nocheck-main.obj Config2Cpp.obj
+		LINK /out:config2cpp-nocheck.exe \
+			config2cpp-nocheck-main.obj Config2Cpp.obj
+
+config4cpp.exe:	config4cpp.obj $(LIB_CONFIG4CPP)
+		LINK /out:config4cpp.exe config4cpp.obj $(LIB_CONFIG4CPP)
+		copy config4cpp.exe $(BIN_DIR)
+
+config4cpp.obj:	config4cpp.cpp 	$(LIB_HDR_FILES)
+
+$(LIB_OBJ_FILES):	$(LIB_HDR_FILES)
+
+clean:
+	del /Q /F *.obj *.pdb *.exe *.lib
+
+clobber: clean
+	del /Q /F $(BIN_DIR)\*.exe
+	del /Q /F $(LIB_DIR)\*.lib
+

@@ -1,0 +1,22 @@
+PROJECT_ROOT=..\..
+!include "$(PROJECT_ROOT)\Makefile.win.inc"
+
+OBJ_FILES=	main.obj
+APP_NAME=	test-schema-types.exe
+CFG_FILE=	schema-type-tests.cfg
+
+all:		compile run-tests
+
+compile:	$(APP_NAME)
+
+$(APP_NAME):	$(OBJ_FILES)
+	LINK /out:$(APP_NAME) $(OBJ_FILES) $(LINK_WITH_CONFIG4CPP)
+
+run-tests:	
+		$(APP_NAME) -cfg $(CFG_FILE)
+
+clean:
+	del /Q *.obj *.pdb $(APP_NAME)
+
+clobber: clean
+

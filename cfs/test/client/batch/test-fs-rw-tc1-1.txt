@@ -1,0 +1,10 @@
+open test_f_0
+pread %1 20 4096
+pread %1 20 8192
+pread %1 20 12288
+pread %1 20 21470
+pread %1 20 5096
+pread %1 20 6096
+pread %1 20 8192
+pread %1 20 8492
+close %1

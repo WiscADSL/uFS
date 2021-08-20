@@ -1,0 +1,13 @@
+open bench_f_0
+cacheread %1 1024
+cacheread %1 1024
+cacheread %1 1024
+cacheread %1 1024
+cacheread %1 4096
+cacheread %1 4096
+cacheread %1 4096
+cachepread %1 4096 0
+cachepread %1 4096 4096
+cachepread %1 1024 4096
+cachepread %1 1024 8192
+close %1

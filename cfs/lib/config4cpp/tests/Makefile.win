@@ -1,0 +1,15 @@
+all:
+	cd schema-types
+	nmake -f Makefile.win all
+	cd ..
+
+clean:
+	cd schema-types
+	nmake -f Makefile.win clean
+	cd ..
+
+clobber:
+	cd schema-types
+	nmake -f Makefile.win clobber
+	cd ..
+

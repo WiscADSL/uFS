@@ -1,0 +1,27 @@
+all:
+	cd src
+	nmake -f Makefile.win all
+	cd ../tests
+	nmake -f Makefile.win all
+	cd ../demos
+	nmake -f Makefile.win all
+	cd ..
+
+clean:
+	cd src
+	nmake -f Makefile.win clean
+	cd ../tests
+	nmake -f Makefile.win clean
+	cd ../demos
+	nmake -f Makefile.win clean
+	cd ..
+
+clobber:
+	cd src
+	nmake -f Makefile.win clobber
+	cd ../tests
+	nmake -f Makefile.win clobber
+	cd ../demos
+	nmake -f Makefile.win clobber
+	cd ..
+

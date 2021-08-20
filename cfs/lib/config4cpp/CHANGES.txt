@@ -1,0 +1,42 @@
+Version 1.1 (2 February 2012): Changes from the original (unnumbered) version.
+------------------------------------------------------------------------------
+
+The following enhancements have been made in Config4Cpp and Config4J:
+
+	- The "durationMicroseconds" type (with associated lookup
+	  operations) has been added to complement the
+	  "durationMilliseconds" and "durationSeconds" types.
+
+	- The "config4cpp" and "config4j" utilities now support a "-set
+	  <name> <value>" command-line option that can be used to preset
+	  variables before parsing the input configuration file.
+
+
+The following bugs have been fixed in Config4Cpp and Config4J:
+
+	- An exception is now thrown if a string literal in a
+	  configuration file contains an invalid escape sequence.
+
+	- The dump() operation now escapes double quotes.
+
+	- An identifier that consists of just "." is now rejected.
+
+
+The following bug has been fixed in Config4Cpp:
+
+	- The Makefile for Config4Cpp now passes the "-fPIC"
+	  command-line option to the g++ compiler, so that it can
+	  generate position-independent code.
+
+
+The following bugs have been fixed in Config4J:
+
+	- The "config2j" utility now uses System.getProperty("line.separator")
+	  instead of "\n" when generating a file.
+
+	- The split() function in a configuration file was always
+	  returning an empty list. That is now fixed.
+
+	- If lookupEnum() threw an exception, then the exception message
+	  referred to <localName>.<localName> instead of
+	  <scope>.<localName>.

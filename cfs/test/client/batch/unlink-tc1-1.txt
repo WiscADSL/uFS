@@ -1,0 +1,16 @@
+## unlink test case 1 - step 1
+##
+## test we can create a deleted file again
+stat sub/t0 st_size
+create sub/t0
+write %5 RPT B 10
+close %5
+stat sub/t0 st_size
+unlink sub/t0
+stat sub/t0 st_size
+## unlink sub/t1
+stat sub/t1 st_size
+unlink sub/t1
+stat sub/t1 st_size
+
+

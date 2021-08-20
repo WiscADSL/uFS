@@ -1,0 +1,9 @@
+open test_f_0
+## partial overwrite, NEED TO READ
+## pwrite fd RPT character offset len
+pwrite %1 RPT z 100 1024
+## partial overwrite, NEED TO READ
+pwrite %1 RPT y 4096 1024
+## full overwrite
+pwrite %1 RPT x 8192 4096
+close %1

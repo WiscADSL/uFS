@@ -1,0 +1,20 @@
+create test_f_0
+write %1% %RANDSTRING(4096)%
+write %1% %RANDSTRING(4096)%
+write %1% %RANDSTRING(4096)%
+write %1% %RANDSTRING(1024)%
+write %1% %RANDSTRING(1024)%
+write %1% %RANDSTRING(1024)%
+write %1% %RANDSTRING(1024)%
+write %1% %RANDSTRING(1000)%
+write %1% %RANDSTRING(1000)%
+write %1% %RANDSTRING(1000)%
+write %1% %RANDSTRING(1000)%
+write %1% %RANDSTRING(4000)%
+write %1% %RANDSTRING(97)%
+pwrite %1% %RANDSTRING(1000)% 4096
+pwrite %1% %RANDSTRING(1000)% 5096
+pwrite %1% %RANDSTRING(2096)% 6096
+pwrite %1% %RANDSTRING(100)% 8192
+pwrite %1% %RANDSTRING(100)% 8492
+close %1%

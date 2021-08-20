@@ -1,0 +1,13 @@
+open bench_f_0
+allocread %1 1024
+allocread %1 1024
+allocread %1 1024
+allocread %1 1024
+allocread %1 4096
+allocread %1 4096
+allocread %1 4096
+allocpread %1 4096 0
+allocpread %1 4096 4096
+allocpread %1 1024 4096
+allocpread %1 1024 8192
+close %1
