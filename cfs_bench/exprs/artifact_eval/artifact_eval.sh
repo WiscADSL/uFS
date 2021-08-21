@@ -35,6 +35,10 @@ fi
 if [ -z "$AE_BENCH_BRANCH" ]; then
 	export AE_BENCH_BRANCH='main'
 fi
+## filebench may need to use a customized branch of uFS with different parameters
+if [ -z "$AE_UFS_FILEBENCH_BRANCH" ]; then
+	export AE_UFS_FILEBENCH_BRANCH='filebench-param'
+fi
 
 ## workspace
 export AE_WORK_DIR="$HOME/workspace"
@@ -69,7 +73,7 @@ function ae-init-mount() {
 	sudo chown -R $USER $AE_WORK_DIR
 	sudo chmod 775 -R $AE_WORK_DIR
 
-	add-if-not-exist "$DEV_NAME        $AE_WORK_DIR        ext4    defaults        0       0" /etc/fstab
+	add-if-not-exist "$DEV_NAME $AE_WORK_DIR ext4 defaults 0 0" /etc/fstab
 
 	echo "Mount: DONE!"
 	touch ~/.ae_mount_done
@@ -106,10 +110,13 @@ function ae-init-install() {
 	add-if-not-exist 'fs.inotify.max_user_watches=524288' /etc/sysctl.conf
 
 	# python lib to run exprs and plotting
-	sudo pip3 ${PIP_PROXY} install sarge psutil numerize pandas
+	sudo pip3 ${PIP_PROXY} install sarge psutil numerize pandas bokeh selenium
 	# must use a customized version of z-plot with csv support
 	git clone https://github.com/jingliu9/z-plot.git
 	sudo pip3 install ./z-plot; sudo rm -rf ./z-plot
+
+	# `bokeh` requires these drivers to render
+	sudo apt-get -y install chromium-browser chromium-chromedriver firefox-geckodriver
 
 	# Some useful shell command:
 	add-if-not-exist "alias ae='bash $AE_SCRIPT_DIR/artifact_eval.sh'" ~/.ae_env.sh

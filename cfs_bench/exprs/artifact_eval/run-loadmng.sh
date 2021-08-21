@@ -126,8 +126,8 @@ function run_lb() {
 }
 
 function run_ca_one_cfg() {
-	# local CUR_ERR_LOG="err_log"
-	local CUR_ERR_LOG="/dev/null"
+	local CUR_ERR_LOG="err_log"
+	# local CUR_ERR_LOG="/dev/null"
 
 	local BURST_ARG=$1
 
@@ -156,10 +156,12 @@ function run_ca_one_cfg() {
 		if [ $NO -eq 1004 ]; then QL=1.1; fi
 		if [ $NO -eq 1005 ]; then QL=1.2; fi
 		sleep 1
-		sudo -E python3 ./fsp_analyze_lb.py --num_rpt 1 --cgstql $QL --expr_no $NO --max_perf ${PY_EXPR_BURST_ARG} 2>$CUR_ERR_LOG
+		sudo -E python3 fsp_analyze_lb.py --num_rpt 1 --cgstql $QL --expr_no $NO --max_perf ${PY_EXPR_BURST_ARG} 2> "$CUR_ERR_LOG"
+		sudo mv "$CUR_ERR_LOG" "log_loadexpr_no-${NO}_ql-${QL}_rpt-0_NW-6_NA-6"
 		sudo mv "log_loadexpr_no-${NO}_ql-${QL}_rpt-0_NW-6_NA-6" "$MAX_DIR_NAME"
 		sleep 1
-		sudo -E python3 ./fsp_analyze_lb.py --num_rpt 1 --cgstql $QL --expr_no $NO ${PY_EXPR_BURST_ARG} 2>$CUR_ERR_LOG
+		sudo -E python3 fsp_analyze_lb.py --num_rpt 1 --cgstql $QL --expr_no $NO ${PY_EXPR_BURST_ARG} 2> "$CUR_ERR_LOG"
+		sudo mv "$CUR_ERR_LOG" "log_loadexpr_no-${NO}_ql-${QL}_rpt-0_NW-6_NA-6"
 		sudo mv "log_loadexpr_no-${NO}_ql-${QL}_rpt-0_NW-6_NA-6" "$DYN_DIR_NAME"
 	done
 }
@@ -175,6 +177,11 @@ function run_ca_burst() {
 }
 
 function run_ca() {
+	data_dir=$(mk-data-dir loadmng_calloc)
+	mkdir -p "$data_dir/gradual_ufs"
+	mkdir -p "$data_dir/gradual_max"
+	mkdir -p "$data_dir/burst_ufs"
+	mkdir -p "$data_dir/burst_max"
 	for RPT in 1 2 3 4 5
 	do
 		# Remove possible conflicted directories
@@ -183,11 +190,6 @@ function run_ca() {
 		sudo rm -rf ca_gradual_max
 		sudo rm -rf ca_burst_ufs
 		sudo rm -rf ca_burst_max
-		data_dir=$(mk-data-dir loadmng_calloc)
-		mkdir -p "$data_dir/gradual_ufs"
-		mkdir -p "$data_dir/gradual_max"
-		mkdir -p "$data_dir/burst_ufs"
-		mkdir -p "$data_dir/burst_max"
 		run_ca_gradual
 		sudo mv ca_gradual_ufs "$data_dir/gradual_ufs/run_$RPT"
 		sudo mv ca_gradual_max "$data_dir/gradual_max/run_$RPT"
@@ -207,7 +209,7 @@ function run_dyn() {
 	prep_data lb
 
 	# run dynmaic workload
-	sudo -E python3 ./fsp_analyze_lb.py --expr_no 1001 --num_worker 8 --num_rpt 3 --cgstql 1.2 --nc
+	sudo -E python3 fsp_analyze_lb.py --expr_no 1001 --num_worker 8 --num_rpt 3 --cgstql 1.2 --nc
 
 	# save results
 	sudo mv log_loadexpr_no* "$data_dir"

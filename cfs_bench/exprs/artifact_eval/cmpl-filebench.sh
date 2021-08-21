@@ -17,6 +17,9 @@ if [ ! "$2" = "ufs" ] && [ ! "$2" = "ext4" ]; then print_usage_and_exit; fi
 
 source "$AE_SCRIPT_DIR/common.sh"
 
+cd "$AE_REPO_DIR"
+git checkout "$AE_UFS_FILEBENCH_BRANCH"
+
 if [ "$1" = "varmail" ]; then
 	export VAR_MACRO='-DVAR'
 elif [ "$1" = "webserver" ]; then
@@ -25,7 +28,7 @@ fi
 
 if [ "$2" = "ufs" ]; then
 	# Ensure uFS is compiled correctly
-	cmpl-ufs
+	cmpl-ufs '-DCFS_DISK_LAYOUT_FILEBENCH=ON'
 	export LIB_CFS='-lcfs'
 	export CFS_MACRO='-DCFS'
 elif [ "$2" = "ext4" ]; then

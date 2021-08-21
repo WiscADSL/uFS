@@ -67,6 +67,8 @@ ae run microbench ext4nj
 ae plot microbench single
 ```
 
+This will create `microbench_single.eps` in the current working directory.
+
 ### Microbenchmark: multithreaded uFS vs. ext4
 
 To compare multithreaded uFS and ext4 (fig. 6 in uFS paper):
@@ -87,10 +89,55 @@ ae run microbench ext4
 ae plot microbench multi
 ```
 
-Note that the microbenchmark includes 32 workloads, and each will be run cases with 1-10 applications. It would take a few hours to complete one `run`. You may want to use `tmux` to make your life easier :)
+This will create `microbench_multi.eps` in the current working directory.
+
+Note that the microbenchmark includes 32 workloads, and each will be run cases with 1-10 applications. It would take around 8 hours to complete all experiments for one figure. You may want to use `tmux` to make your life easier :)
 
 ## Filebench
 
+Filebench consists of two experiments: one running Varmail workload to show the effect of uFS threads number, and the other running Webserver workload to show the effect of the client-side cache hit rate. Note the filebench experiments depend on uFS-bench repository, which should be automatically pulled during `init`.
+
+### Filebench: Varmail
+
+To run Varmail workload on multithreaded uFS and ext4 (fig. 8-left in uFS paper):
+
+```bash
+# compile filebench with uFS APIs and varmail's configuration
+ae cmpl filebench varmail ufs
+ae run filebench varmail ufs
+# the results could be accessed through the symbolic link `./AE_DATA/DATA_filebench_varmail_ufs`
+
+# then ext4 (also need recompile filebench)
+ae cmpl filebench varmail ext4
+ae run filebench varmail ext4
+# the results could be accessed through the symbolic link `./AE_DATA/DATA_filebench_varmail_ext4`
+
+# plot
+ae plot filebench varmail
+```
+
+The application-side throughput results would be printed to `stdout` and saved to `varmail.data`. It will also generate a plot named `filebench_varmail.eps` in the current working directory. As a side note, the `plot` command only generates the case when uFS uses 1 to 4 threads, though the `run` command does run the cases of 1 to 10 threads. Empirically, we observe uFS using 5 to 10 threads behave very similar to uFS-4, so their curves mostly overlap and make the figure less readable. As a result, we decide not to put them on the figure, but their performance results would still be printed to `stdout` for reference.
+
+### Filebench: Webserver
+
+To run Webserver workload on uFS with different client cache hit rate and ext4 (fig. 8-middle in uFS paper):
+
+```bash
+# compile filebench with uFS APIs and webserver's configuration
+ae cmpl filebench webserver ufs
+ae run filebench webserver ufs
+ae cmpl filebench webserver ext4
+ae cmpl filebench webserver ext4
+# the results could be accessed through the symbolic links
+# `./AE_DATA/DATA_filebench_webserver_ufs` and `./AE_DATA/DATA_filebench_webserver_ext4`
+
+# plot
+ae plot filebench webserver
+```
+
+The results would be printed to `stdout` and saved to `webserver.data`. A plot named `filebench_webserver.eps` would also be generated.
+
+Make sure to always run `cmpl` before `run` in filebench experiments. Also note that filebench uses a customized branch of uFS in the experiments (checkout by the scripts automatically), because filebench is a stress test so that we have to lift some limits inside uFS (e.g. lift the limit on the number of file descriptors).
 
 ## Load Management
 
@@ -107,10 +154,13 @@ To compare uFS load balancing performance with other alternative settings (fig. 
 ```bash
 # run load balancing benchmarks (three policies: ufs, ufs_max, ufs_rr)
 ae run loadmng ldbal
-# the results could be accessed through the symbolic link `./AE_DATA/DATA_loadmng_ufs`, `./AE_DATA/DATA_loadmng_max`, and `./AE_DATA/DATA_loadmng_rr`
+# the results could be accessed through the symbolic link `./AE_DATA/DATA_loadmng_ufs`,
+# `./AE_DATA/DATA_loadmng_max`, and `./AE_DATA/DATA_loadmng_rr`
 
 ae plot loadmng ldbal
 ```
+
+The plot script will parse the logs and collect data. The final results would be printed to `stdout`, as well as saved to `loadmng_ldbal_results.txt` in the current working directory. Note that this `plot` command doesn't really produce a figure. The amount of data in the final results is small, in which case a table (in `txt` form) should be as clear as a bar graph.
 
 ### Load Management: Core Allocation
 
@@ -121,8 +171,11 @@ To compare uFS core allocation performance with other alternative settings (fig.
 ae run loadmng calloc
 # the results could be accessed through the symbolic link `./AE_DATA/DATA_calloc`
 
+# this plot may take a while as there is a large number of logs to process
 ae plot loadmng calloc
 ```
+
+This `plot` doesn't produce a figure, either. The final results would be printed to `stdout` and saved to `loadmng_calloc_results.txt`. 
 
 ### Load Management: Dynamic Behavior
 
@@ -135,6 +188,8 @@ ae run loadmng dynamic
 
 ae plot loadmng dynamic
 ```
+
+One round of experiment would produce two figures: one shows applications' throughput and the other shows uServer's CPU utilization. To alleviate the effect of randomness, the script will repeat the experiments for three rounds, and the output would suffix with `rptX` where `X` is the round number. Thus, this `plot` command would generate 6 figures in the current working directory: `dynamic-behavior-app-throughput-rptX.png` and `ufs-cpu-utilization-rptX.png` for `X` being `0`, `1`, `2`.
 
 ## LevelDB
 
@@ -150,3 +205,5 @@ ae plot loadmng dynamic
 - `AE_BENCH_BRANCH`: customize which branch of uFS-bench repository to use
 
 - `AE_BENCH_REPO_URL`: URL to pull uFS-bench repository
+
+- `AE_UFS_FILEBENCH_BRANCH`: customize which branch of uFS repository to use for filebench; filebench may need some customize configures (e.g. lift the limit of the number of fd)

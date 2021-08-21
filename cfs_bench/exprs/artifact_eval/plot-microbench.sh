@@ -26,8 +26,8 @@ MICROBENCH_PLOT_DIR=$AE_REPO_DIR/cfs_bench/exprs/microbench_plot
 
 if [ "$1" = "single" ]; then # Please make sure this ufs is compiled with nj
 	# test data dir exist
-	test_data_dir_exist $AE_DATA_DIR/DATA_microbench_ufs-single
-	test_data_dir_exist $AE_DATA_DIR/DATA_microbench_ext4nj
+	test-data-dir-exist $AE_DATA_DIR/DATA_microbench_ufs-single
+	test-data-dir-exist $AE_DATA_DIR/DATA_microbench_ext4nj
 
 	# parse output and generate CSV
 	python3 "$MICROBENCH_PLOT_DIR/parse_log.py" --fs fsp --dir $AE_DATA_DIR/DATA_microbench_ufs-single
@@ -35,8 +35,8 @@ if [ "$1" = "single" ]; then # Please make sure this ufs is compiled with nj
 	python3 "$MICROBENCH_PLOT_DIR/plot_ufs_ext4_cmp.py" "microbench_single" "uFSnj:$AE_DATA_DIR/DATA_microbench_ufs-single" "ext4nj:$AE_DATA_DIR/DATA_microbench_ext4nj"
 elif [ "$1" = "multi" ]; then
 	# test data dir exist
-	test_data_dir_exist $AE_DATA_DIR/DATA_microbench_ufs
-	test_data_dir_exist $AE_DATA_DIR/DATA_microbench_ext4
+	test-data-dir-exist $AE_DATA_DIR/DATA_microbench_ufs
+	test-data-dir-exist $AE_DATA_DIR/DATA_microbench_ext4
 
 	python3 "$MICROBENCH_PLOT_DIR/parse_log.py" --fs fsp --dir $AE_DATA_DIR/DATA_microbench_ufs
 	python3 "$MICROBENCH_PLOT_DIR/parse_log.py" --fs ext4 --dir $AE_DATA_DIR/DATA_microbench_ext4

@@ -19,6 +19,9 @@ if [ ! "$1" = "ufs" ] && [ ! "$1" = "ufsnj" ]; then print_usage_and_exit; fi
 
 source "$AE_SCRIPT_DIR/common.sh"
 
+cd "$AE_REPO_DIR"
+git checkout "$AE_BRANCH"
+
 if [ "$1" = "ufs" ]; then
 	cmpl-ufs
 elif [ "$1" = "ufsnj" ]; then

@@ -30,14 +30,13 @@ data_dir="$(mk-data-dir filebench_$1_$2)"
 if [ "$2" = "ufs" ]; then
 	# Ensure SSD in under SPDK's control
 	setup-spdk
-
+	# Ensure no configs left in the last round
+	cleanup-ufs-config
 	# Prepare spdk.conf
-	sudo rm -rf /tmp/spdk.conf
 	echo 'dev_name = "spdkSSD";' >> /tmp/spdk.conf
 	echo 'core_mask = "0x2";' >> /tmp/spdk.conf
 	echo 'shm_id = "9";' >> /tmp/spdk.conf
 	# Prepare fsp.conf
-	sudo rm -rf /tmp/fsp.conf
 	echo 'splitPolicyNum = "5";' >> /tmp/fsp.conf
 	echo 'serverCorePolicyNo = "5";' >> /tmp/fsp.conf
 	echo 'dirtyFlushRatio = "0.9";' >> /tmp/fsp.conf
@@ -45,9 +44,9 @@ if [ "$2" = "ufs" ]; then
 
 	# Now run benchmark script
 	if [ "$1" = "varmail" ]; then
-		sudo -E python3 scripts/run_varmail_fsp.py "$data_dir"
+		sudo -E python3 scripts/run_varmail_ufs.py "$data_dir"
 	elif [ "$1" = "webserver" ]; then
-		sudo -E python3 scripts/run_webserver_fsp.py "$data_dir" 0
+		sudo -E python3 scripts/run_webserver_ufs.py "$data_dir" 0
 	fi
 
 	# Clean up config files

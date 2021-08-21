@@ -17,5 +17,8 @@ if [ ! $# = "0" ]; then print_usage_and_exit; fi
 
 source "$AE_SCRIPT_DIR/common.sh"
 
+cd "$AE_REPO_DIR"
+git checkout "$AE_BRANCH"
+
 # Compile uFS with flag to output load balancing information
 cmpl-ufs '-DUFS_EXPR_LBNC=ON' '-DCFS_DISK_LAYOUT_LEVELDB=ON'

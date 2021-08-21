@@ -21,7 +21,7 @@ function mk-data-dir() {
 	echo "$data_dir"
 }
 
-function test_data_dir_exist() {
+function test-data-dir-exist() {
 	if [ ! -d "$1" ]; then
 		echo "Data directory not found: Expect $1"
 		exit 1

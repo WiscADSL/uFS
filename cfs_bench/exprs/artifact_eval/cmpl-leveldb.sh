@@ -21,6 +21,9 @@ elif [ "$1" = "ext4" ]; then
 	LDB_CMAKE_CFS_ARG="-DLEVELDB_JL_LIBCFS=OFF"
 fi
 
+cd "$AE_REPO_DIR"
+git checkout "$AE_BRANCH"
+
 # compile leveldb
 cd "$AE_BENCH_REPO_DIR"
 git checkout "$AE_BENCH_BRANCH"

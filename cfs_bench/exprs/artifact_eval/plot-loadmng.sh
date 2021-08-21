@@ -27,24 +27,30 @@ if [ "$1" = "ldbal" ]; then
 	LDBAL_UFS_DIR="$AE_DATA_DIR/DATA_loadmng_ldbal_ufs"
 	LDBAL_RR_DIR="$AE_DATA_DIR/DATA_loadmng_ldbal_rr"
 	LDBAL_MAX_DIR="$AE_DATA_DIR/DATA_loadmng_ldbal_max"
-	test_data_dir_exist $LDBAL_UFS_DIR
-	test_data_dir_exist $LDBAL_RR_DIR
-	test_data_dir_exist $LDBAL_MAX_DIR
+	test-data-dir-exist $LDBAL_UFS_DIR
+	test-data-dir-exist $LDBAL_RR_DIR
+	test-data-dir-exist $LDBAL_MAX_DIR
 
 	# parse and plot
-	bash "$LOADMNG_PLOT_DIR/ldbal/parse_ldbal_log.sh" "$LDBAL_UFS_DIR" "$LDBAL_RR_DIR" "$LDBAL_MAX_DIR"
-	python3 "$LOADMNG_PLOT_DIR/ldbal/summarize_ldbal.py" "$LDBAL_UFS_DIR" "$LDBAL_RR_DIR" "$LDBAL_MAX_DIR"
+	bash "$LOADMNG_PLOT_DIR/ldbal/parse_ldbal_log.sh" "$LDBAL_UFS_DIR" "$LDBAL_RR_DIR" "$LDBAL_MAX_DIR" > /dev/null
+	python3 "$LOADMNG_PLOT_DIR/ldbal/summarize_ldbal.py" "$LDBAL_UFS_DIR" "$LDBAL_RR_DIR" "$LDBAL_MAX_DIR" | tee ./loadmng_ldbal_results.txt
 elif [ "$1" = "calloc" ]; then
 	# data_dir
 	CALLOC_DIR="$AE_DATA_DIR/DATA_loadmng_calloc"
-	test_data_dir_exist $CALLOC_DIR
+	test-data-dir-exist $CALLOC_DIR
 
-	bash "$LOADMNG_PLOT_DIR/calloc/parse_calloc_log.sh" "$CALLOC_DIR"
-	python3 "$LOADMNG_PLOT_DIR/calloc/summarize_calloc.py" "$CALLOC_DIR"
+	bash "$LOADMNG_PLOT_DIR/calloc/parse_calloc_log.sh" "$CALLOC_DIR" > /dev/null
+	python3 "$LOADMNG_PLOT_DIR/calloc/summarize_calloc.py" "$CALLOC_DIR" | tee ./loadmng_calloc_results.txt
 elif [ "$1" = "dynamic" ]; then
 	# data_dir
 	DYNAMIC_DIR="$AE_DATA_DIR/DATA_loadmng_dynamic"
-	test_data_dir_exist $DYNAMIC_DIR
+	test-data-dir-exist $DYNAMIC_DIR
 
-	python3 "$LOADMNG_PLOT_DIR/dynamic/plot_dynamic.py" "$DYNAMIC_DIR/log-numseg-1" 8
+	for RPT in 0 1 2; do
+		data_log_dir="$DYNAMIC_DIR/log_loadexpr_no-1001_ql-1.2_rpt-${RPT}_NW-8_NA-8/log-numseg-1"
+		python3 "$LOADMNG_PLOT_DIR/dynamic/plot_dynamic.py" "$data_log_dir" 8 "rpt$RPT" > /dev/null
+		# copy figures into the current working directory
+		cp -f "$data_log_dir/dynamic-behavior-app-throughput-rpt${RPT}.png" ./
+		cp -f "$data_log_dir/ufs-cpu-utilization-rpt${RPT}.png" ./
+	done
 fi
