@@ -58,7 +58,7 @@ function load_data_ext4() {
 # Thus, it is strongly preferred to run `all` instead of individual `ycsb-X`
 # one-by-one, so that the script could resue the image
 if [ "$2" = "ufs" ]; then
-    # Setup device
+	# Setup device
 	setup-spdk
 	# Prep for spdk's config
 	cleanup-ufs-config
@@ -80,10 +80,10 @@ elif [ "$2" = "ext4" ]; then
 	reset-spdk
 	setup-ext4
 
-    sudo rm -rf "/ssd-data/0"
-    sudo rm -rf "$REUSE_DATA_DIR"
-    sudo mkdir -p "/ssd-data/0"
-    sudo mkdir -p "$REUSE_DATA_DIR"
+	sudo rm -rf "/ssd-data/0"
+	sudo rm -rf "$REUSE_DATA_DIR"
+	sudo mkdir -p "/ssd-data/0"
+	sudo mkdir -p "$REUSE_DATA_DIR"
 
 	echo "===================================================================="
 	echo "Ext4 mount succeeds. However before further experiments, we will wait for $AE_EXT4_WAIT_AFTER_MOUNT seconds, because ext4's mount contains lazy operations, which would affect performance significantly. To ensure fair comparsion, we will resume experiments $AE_EXT4_WAIT_AFTER_MOUNT seconds later. Go grab a coffee!"
