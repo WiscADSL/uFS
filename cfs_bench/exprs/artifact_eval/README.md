@@ -195,7 +195,7 @@ One round of experiment would produce two figures: one shows applications' throu
 
 The version of LevelDB used in this experiment is `leveldb-1.22`. We ported its filesystem calls to uFS's APIs, and the codebase would be pulled during `init`.
 
-We use 6 YCSB traces, named as `ycsb-X` for `X` being `a` to `f`. One could run them one-by-one, as well as simply run `all`
+We use 6 YCSB traces, named as `ycsb-X` for `X` being `a` to `f`. One could run them one-by-one, as well as simply run `all` (fig. 12 in uFS paper):
 
 ```bash
 ae cmpl leveldb ufs
@@ -213,7 +213,7 @@ do
 done
 ```
 
-The results would be printed to `stdout` and saved as `ycsb-X.data`.
+The results would be printed to `stdout` and saved as `ycsb-X.data`. We recommend using `all` instead of manully running these six cases one-by-one, as the option `all` enables the script to reuse environments and skip preparation, which largely speeds up the experiments.
 
 ## Advanced Usage
 
