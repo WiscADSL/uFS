@@ -35,9 +35,14 @@ fi
 if [ -z "$AE_BENCH_BRANCH" ]; then
 	export AE_BENCH_BRANCH='main'
 fi
-## filebench may need to use a customized branch of uFS with different parameters
+## filebench may need to use a customized branch of uFS with a different configuration
 if [ -z "$AE_UFS_FILEBENCH_BRANCH" ]; then
-	export AE_UFS_FILEBENCH_BRANCH='filebench-param'
+	export AE_UFS_FILEBENCH_BRANCH='filebench-config'
+fi
+## ext4's mount contains lazy operations, which would affect its performance 
+## wait a while before further experiments
+if [ -z "$AE_EXT4_WAIT_AFTER_MOUNT" ]; then
+	export AE_EXT4_WAIT_AFTER_MOUNT='300'  # unit is second
 fi
 
 ## workspace
@@ -349,7 +354,8 @@ function ae-run() {
 	sudo killall fsMain
 	sudo killall cfs_bench_coordinator
 	sudo rm -rf /ufs-*
-	sudo rm -rf /dev/shm/coordinator
+	sudo rm -rf /dev/shm/*
+	sudo ipcrm --all
 	set -e
 
 	if [ "$1" = "microbench" ]; then

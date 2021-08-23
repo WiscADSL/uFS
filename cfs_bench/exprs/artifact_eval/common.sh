@@ -54,11 +54,51 @@ function cmpl-ufs() {
 ## Environment Setup
 
 function setup-spdk() {
+	DEV_NAME="/dev/$SSD_NAME"
+	if sudo grep -qF "$DEV_NAME $KFS_MOUNT_PATH" /proc/mounts ; then
+		echo "WARN: Detect $DEV_NAME has already mounted on $KFS_MOUNT_PATH"
+		echo "      Will umount first before setup SPDK"
+		sudo umount "$KFS_MOUNT_PATH"
+	fi
 	sudo -E python3 $AE_REPO_DIR/cfs_bench/exprs/fsp_microbench_suite.py --fs fsp --devonly
 }
 
 function reset-spdk() {
+	DEV_NAME="/dev/$SSD_NAME"
+	if sudo grep -qF "$DEV_NAME $KFS_MOUNT_PATH" /proc/mounts ; then
+		echo "WARN: Detect $DEV_NAME has already mounted on $KFS_MOUNT_PATH"
+		echo "      Will NOT reset SPDK"
+		return
+	fi
 	sudo bash $AE_REPO_DIR/cfs/lib/spdk/scripts/setup.sh reset
+}
+
+# Here is the recommended pattern of using ext4:
+# - setup-ext4
+# - sleep 300
+# - do as many experiments as possible (batch)
+# - reset-ext4
+# This batching is to avoid redundant time spent on waiting ext4 to finish
+# lazy operations (see below)
+
+# NOTE: ext4 have many lazy operations in mount, so it is strongly recommended
+#       to wait for ~5 min before further experiments
+# Ref: https://askubuntu.com/questions/402785/writes-occurring-to-fresh-ext4-partition-every-second-endlessly-cause-and-solut
+# TODO: use non-lazy mount
+function setup-ext4() {
+	DEV_NAME="/dev/$SSD_NAME"
+	# check if already mount; if yes, umount first and print warning
+	if sudo grep -qF "$DEV_NAME $KFS_MOUNT_PATH" /proc/mounts ; then
+		echo "WARN: Detect $DEV_NAME has already mounted on $KFS_MOUNT_PATH"
+		echo "      Will umount first before setup ext4"
+		sudo umount "$KFS_MOUNT_PATH"
+	fi
+	sudo mkfs -F -t ext4 "$DEV_NAME"
+	sudo mount "$DEV_NAME" "$KFS_MOUNT_PATH"
+}
+
+function reset-ext4() {
+	sudo umount "$KFS_MOUNT_PATH"
 }
 
 function cleanup-ufs-config() {

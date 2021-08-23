@@ -28,7 +28,7 @@ git checkout "$AE_BRANCH"
 cd "$AE_BENCH_REPO_DIR"
 git checkout "$AE_BENCH_BRANCH"
 cd leveldb-1.22
-rm -rf build
+sudo rm -rf build
 mkdir build && cd build
 cmake ${LDB_CMAKE_CFS_ARG} -DCMAKE_BUILD_TYPE=Release ..
 make -j "$AE_CMPL_THREADS"

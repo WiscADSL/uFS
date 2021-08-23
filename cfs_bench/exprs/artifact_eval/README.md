@@ -193,6 +193,27 @@ One round of experiment would produce two figures: one shows applications' throu
 
 ## LevelDB
 
+The version of LevelDB used in this experiment is `leveldb-1.22`. We ported its filesystem calls to uFS's APIs, and the codebase would be pulled during `init`.
+
+We use 6 YCSB traces, named as `ycsb-X` for `X` being `a` to `f`. One could run them one-by-one, as well as simply run `all`
+
+```bash
+ae cmpl leveldb ufs
+ae run leveldb all ufs
+# the results could be accessed through `./AE_DATA/DATA_leveldb_ycsb-X_ufs` for `X` being `a` to `f`
+
+ae cmpl leveldb ext4
+ae run leveldb all ext4
+# the results could be accessed through `./AE_DATA/DATA_leveldb_ycsb-X_ext4` for `X` being `a` to `f`
+
+# plot them all
+for X in 'a' 'b' 'c' 'd' 'e' 'f'
+do
+	ae plot leveldb ycsb-$X
+done
+```
+
+The results would be printed to `stdout` and saved as `ycsb-X.data`.
 
 ## Advanced Usage
 
@@ -207,3 +228,5 @@ One round of experiment would produce two figures: one shows applications' throu
 - `AE_BENCH_REPO_URL`: URL to pull uFS-bench repository
 
 - `AE_UFS_FILEBENCH_BRANCH`: customize which branch of uFS repository to use for filebench; filebench may need some customize configures (e.g. lift the limit of the number of fd)
+
+- `AE_EXT4_WAIT_AFTER_MOUNT`: customize how long (unit: second) to wait after mounting ext4. Ext4's mount includes some lazy operations, which would affect its performance. Thus, we wait for 300 seconds after mounting before further experiments.
