@@ -1,0 +1,23 @@
+PROJECT_ROOT=..\..
+!include "$(PROJECT_ROOT)\Makefile.win.inc"
+
+OBJ_FILES= FallbackConfiguration.obj FooConfiguration.obj main.obj
+
+all:	demo$(EXE_EXT)
+
+FallbackConfiguration.cpp FallbackConfiguration.h: FallbackConfiguration.cfg
+	$(BIN_DIR)\config2cpp -cfg FallbackConfiguration.cfg \
+		-class FallbackConfiguration -singleton
+
+FooConfiguration.o: FooConfiguration.h FooConfiguration.cpp \
+					FallbackConfiguration.h
+
+demo$(EXE_EXT):	$(OBJ_FILES)
+	LINK /out:demo.exe $(OBJ_FILES) $(LINK_WITH_CONFIG4CPP)
+
+clean:
+	del /Q *.obj *.pdb demo.exe
+	del /Q FallbackConfiguration.h FallbackConfiguration.cpp
+
+clobber: clean
+

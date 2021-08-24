@@ -1,0 +1,22 @@
+PROJECT_ROOT=..\..
+!include "$(PROJECT_ROOT)\Makefile.win.inc"
+
+OBJ_FILES= RecipeFileParser.obj main.obj
+
+all:	demo$(EXE_EXT)
+
+DefaultFooConfigString.cpp DefaultFooConfigString.h: DefaultFooConfigString.cfg
+		$(BIN_DIR)\config2cpp -cfg DefaultFooConfigString.cfg \
+					-class DefaultFooConfigString
+
+FooConfiguration.o: FooConfiguration.h FooConfiguration.cpp \
+					DefaultFooConfigString.h
+
+demo$(EXE_EXT):	$(OBJ_FILES)
+	LINK /out:demo.exe $(OBJ_FILES) $(LINK_WITH_CONFIG4CPP)
+
+clean:
+	del /Q *.obj *.pdb demo.exe
+
+clobber: clean
+

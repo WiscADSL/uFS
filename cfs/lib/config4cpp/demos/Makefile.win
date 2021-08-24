@@ -1,0 +1,39 @@
+all:
+	cd encapsulate-lookup-api
+	nmake -f Makefile.win all
+	cd ../extended-schema-validator
+	nmake -f Makefile.win all
+	cd ../log-level
+	nmake -f Makefile.win all
+	cd ../recipes
+	nmake -f Makefile.win all
+	cd ../simple-encapsulation
+	nmake -f Makefile.win all
+	cd ..
+
+clean:
+	cd encapsulate-lookup-api
+	nmake -f Makefile.win clean
+	cd ../extended-schema-validator
+	nmake -f Makefile.win clean
+	cd ../log-level
+	nmake -f Makefile.win clean
+	cd ../recipes
+	nmake -f Makefile.win clean
+	cd ../simple-encapsulation
+	nmake -f Makefile.win clean
+	cd ..
+
+clobber:
+	cd encapsulate-lookup-api
+	nmake -f Makefile.win clobber
+	cd ../extended-schema-validator
+	nmake -f Makefile.win clobber
+	cd ../log-level
+	nmake -f Makefile.win clobber
+	cd ../recipes
+	nmake -f Makefile.win clobber
+	cd ../simple-encapsulation
+	nmake -f Makefile.win clobber
+	cd ..
+

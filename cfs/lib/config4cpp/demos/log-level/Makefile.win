@@ -1,0 +1,17 @@
+PROJECT_ROOT=..\..
+!include "$(PROJECT_ROOT)\Makefile.win.inc"
+
+OBJ_FILES= FooConfiguration.obj Logger.obj A.obj B.obj main.obj
+
+all:	demo.exe
+
+FooConfiguration.o: FooConfiguration.h FooConfiguration.cpp
+
+demo.exe:	$(OBJ_FILES)
+	LINK /out:demo.exe $(OBJ_FILES) $(LINK_WITH_CONFIG4CPP)
+
+clean:
+	del /Q *.obj *.pdb demo.exe
+
+clobber: clean
+
