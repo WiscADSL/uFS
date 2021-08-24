@@ -30,12 +30,12 @@
 
 // random picked # of inodes for disk layout
 // NOTE: NINODES <= NMEMINODE, to make sure all inodes can be cached
-#define NINODES 125000  // number of inodes
+#define NINODES 160000  // number of inodes
 //#define IMAPBLOCK_NUM (((NINODES) / (BSIZE * 8)) + 1)  // number of imap
 // blocks
 // We assume 1 imap block is large enough to hold all the inode in-memory
 // That is., 32768 inodes
-#define IMAPBLOCK_NUM (4)
+#define IMAPBLOCK_NUM (5)
 
 // make sure imap can contains all inodes
 static_assert((NINODES) <= (IMAPBLOCK_NUM) * (BSIZE * 8));

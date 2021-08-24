@@ -469,7 +469,7 @@ FileObj *AppProc::allocateFd(InMemInode *inodePtr, int openFlags,
 }
 
 int AppProc::updateFdIncrByWid(int wid) {
-  fdIncr = wid * 10000000 + kFdBase;
+  fdIncr = wid * 100000000 + kFdBase;
   return fdIncr;
 }
 

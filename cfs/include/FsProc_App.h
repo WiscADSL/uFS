@@ -239,7 +239,7 @@ class AppProc {
   }
 
   struct shmipc_mgr *shmipc_mgr = NULL;
-  static constexpr int kFdBase = 100000;
+  static constexpr int kFdBase = 1000000;
 
  private:
   int appIdx;         // used for computing shmKey

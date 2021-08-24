@@ -45,7 +45,7 @@ struct LocalFileObj {
 
 class OpenLease {
  public:
-  static constexpr int local_fd_offset = 1000000;
+  static constexpr int local_fd_offset = 10000000;
   static constexpr uint64_t lease_term = 1000000000;
 
   static int FindOffset(int fd) { return (fd / local_fd_offset) % 10; }

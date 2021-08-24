@@ -194,7 +194,7 @@ uint32_t inline extentArrIdx2BlockAllocUnit(int extentArrIdx) {
   } else if (extentArrIdx == 1) {
     // 1M data (if BSIZE=4K)
     // return 256;
-    return 2048;
+    return 32;
   } else if (extentArrIdx == NEXTENT_ARR - 1) {
     // last extent
     return (LAST_EXTENT_ALLOC_UNIT_BYTE) / (BSIZE);
@@ -204,8 +204,8 @@ uint32_t inline extentArrIdx2BlockAllocUnit(int extentArrIdx) {
 }
 
 // For each work, it can get only one file in the largest extent
-#define MAX_LARGE_FILE_NUM (NMAX_FSP_WORKER)
-// #define MAX_LARGE_FILE_NUM 2
+// #define MAX_LARGE_FILE_NUM (NMAX_FSP_WORKER)
+#define MAX_LARGE_FILE_NUM (1)
 #define LAST_EXTENT_MAX_BMAP_BLOCK_NUM \
   ((LAST_EXTENT_ALLOC_UNIT_BYTE / (BPB * BSIZE)) * MAX_LARGE_FILE_NUM)
 
@@ -224,8 +224,7 @@ uint32_t inline extentArrIdx2BlockAllocUnit(int extentArrIdx) {
 // const int kFsPerExtShareArr[] = {1, 80, 10, 0, 0, 0};  // levelDB
 const int kFsPerExtShareArr[] = {1, 639, 0, 0, 0, 0};  // levelDB
 #elif defined(_EXTENT_FOR_FILEBENCH_)
-const int kFsPerExtShareArr[] = {20, 200, 10,
-                                 10, 10,  10};  // filebench
+const int kFsPerExtShareArr[] = {20, 300, 1, 1, 1, 1};  // filebench
 #else
 const int kFsPerExtShareArr[] = {1, 1, 4, 8, 16, 20};  // micro-bench@bumble
 #endif
