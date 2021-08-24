@@ -28,3 +28,4 @@ CONFIG.local
 mk/cc.mk
 PYTHON_COMMAND
 !Makefile
+!*.map
