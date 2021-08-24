@@ -696,10 +696,12 @@ static int send_noargop(FsService *fsServ, CfsOpCode opcode) {
 static int gPrimaryServWid = APP_CFS_COMMON_KNOWLEDGE_MASTER_WID;
 FsLibSharedContext *gLibSharedContext = nullptr;
 
+#ifdef UFS_SOCK_LISTEN
 static key_t g_registered_shm_key_base = 0;
 static int g_registered_max_num_worker = -1;
 static int g_registered_shmkey_distance = -1;
 std::once_flag g_register_flag;
+#endif
 
 // Used for multiple Fs processes
 static FsLibServiceMng *gServMngPtr = nullptr;
@@ -984,9 +986,11 @@ void fs_register_via_socket() {
   if (nr == -1) {
     fprintf(stderr, "Error: recv ack return -1\n");
   }
+#ifdef UFS_SOCK_LISTEN
   g_registered_max_num_worker = rgst_ack_op.num_worker_max;
   g_registered_shm_key_base = rgst_ack_op.shm_key_base;
   g_registered_shmkey_distance = rgst_ack_op.worker_key_distance;
+#endif
 }
 
 static void print_app_zc_mimic() {
@@ -1035,6 +1039,7 @@ int fs_init(key_t key) {
 
 // NOTE: guarded by gMultiFsServLock
 int fs_init_after_registration() {
+#ifdef UFS_SOCK_LISTEN
   if (g_registered_max_num_worker <= 0) return -1;
   while (gServMngPtr == nullptr) {
     if (gMultiFsServLock.test_and_set(std::memory_order_acquire)) {
@@ -1067,16 +1072,20 @@ int fs_init_after_registration() {
       gMultiFsServLock.clear(std::memory_order_release);
     }
   }
+#endif
   return 0;
 }
 
 // Use for app do not know its' key. which is for real application
 int fs_register(void) {
+#ifdef UFS_SOCK_LISTEN
   std::call_once(g_register_flag, fs_register_via_socket);
   // fprintf(stdout, "g_register_shm_key_base:%d max_nw:%d\n",
   //        g_registered_shm_key_base, g_registered_max_num_worker);
   int rt = fs_init_after_registration();
   return rt;
+#endif
+  return -1;
 }
 
 // each key will represent one FSP thread (instance/worker)
@@ -1143,7 +1152,7 @@ int fs_exit() {
     ring_idx = shmipc_mgr_alloc_slot_dbg(service->shmipc_mgr);
     eop = (struct exitOp *)IDX_TO_XREQ(service->shmipc_mgr, ring_idx);
     prepare_exitOp(&msg, eop);
-    fprintf(stdout, "fs_exit: for wid %d\n", wid);
+    // fprintf(stdout, "fs_exit: for wid %d\n", wid);
     shmipc_mgr_put_msg(service->shmipc_mgr, ring_idx, &msg);
     ret = eop->ret;
     shmipc_mgr_dealloc_slot(service->shmipc_mgr, ring_idx);
@@ -1207,7 +1216,7 @@ int fs_cleanup() {
   while (!gCleanedUpDone) {
     if (gMultiFsServLock.test_and_set(std::memory_order_acquire)) {
       for (auto ele : gServMngPtr->multiFsServMap) {
-        fprintf(stderr, "fs_cleanup: key:%d\n", ele.first);
+        // fprintf(stderr, "fs_cleanup: key:%d\n", ele.first);
         delete ele.second;
         ele.second = nullptr;
       }
@@ -1512,7 +1521,7 @@ static int fs_open_internal(FsService *fsServ, const char *path, int flags,
   ret = oop->ret;
   if (size) *size = oop->size;
 
-#ifndef CFS_DISK_LAYOUT_LEVELDB
+#ifndef CFS_LIB_LDB
   if (ret >= 0) {
     auto curLock = &(gLibSharedContext->fdFileHandleMapLock);
     curLock->lock();

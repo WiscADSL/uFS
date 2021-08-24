@@ -107,6 +107,7 @@ void UnixSocketListener::SockListenRunner() {
     ;
   SPDLOG_INFO("{} is running ------", typeid(this).name());
 
+#ifdef UFS_SOCK_LISTEN
   struct msghdr recv_msgh;
 
   struct iovec recv_iov;
@@ -183,7 +184,8 @@ void UnixSocketListener::SockListenRunner() {
       throw std::runtime_error("sendmsg shmkey back to app fail");
     }
 
-  }  // running_
+  }     // running_
+#endif  // UFS_SOCK_LISTEN
 }
 
 }  // namespace fsp_sock

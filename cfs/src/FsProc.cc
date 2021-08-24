@@ -138,7 +138,6 @@ void FsProc::cleanup() {
   SPDLOG_INFO("Bye :)");
 }
 
-
 int AppProc::GetDstWid(int tau_id, cfs_ino_t ino) {
   auto cur_plc_no = gFsProcPtr->getSplitPolicy();
   if (cur_plc_no != SPLIT_POLICY_NO_TWEAK_MOD &&
@@ -182,6 +181,7 @@ void FsProc::startWorkers(std::vector<int> &shmOffsetVec,
     return;
   }
 
+#ifdef UFS_SOCK_LISTEN
   if (shmOffsetVec.size() > 1) {
     worker_shmkey_distance = shmOffsetVec[1] - shmOffsetVec[0];
     for (size_t shmoff_idx = 1; shmoff_idx < shmOffsetVec.size();
@@ -198,6 +198,7 @@ void FsProc::startWorkers(std::vector<int> &shmOffsetVec,
   } else if (shmOffsetVec.size() == 1) {
     worker_shmkey_distance = 0;
   }
+#endif
 
   auto messenger = new FsProcMessenger(numThreads, DEFAULT_MESSENGER_BUFSIZE);
   loadMng->setMessenger(messenger);

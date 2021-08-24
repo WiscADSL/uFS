@@ -303,6 +303,7 @@ class FsProc {
     loadMng->ManualThreadReassignment(dst_wid, pid, tid);
   }
 
+#ifdef UFS_SOCK_LISTEN
   void RetireAppIdx(int app_idx) { retired_app_idx_.emplace(app_idx); }
 
   int GetNextAppIdxThenIncr() {
@@ -324,6 +325,7 @@ class FsProc {
 
   int GetNextAppIdxNoIncr() { return rgst_app_idx_incr_; }
   int GetWorkerShmkeyDistance() { return worker_shmkey_distance; }
+#endif
 
  private:
   // number of workers to carry FSP function
@@ -353,11 +355,16 @@ class FsProc {
   // state of a worker whether it is asleep or not
   std::atomic_bool *workerActive;
 
+#ifdef UFS_SOCK_LISTEN
   // a thread that listens UNIX domain socket to establish
   // connection with clients
-#ifdef UFS_SOCK_LISTEN
   std::thread *sock_listen_thread_{nullptr};
   fsp_sock::UnixSocketListener *sock_listener_{nullptr};
+  // used for assign app id slot for the pre-allocated msg rings
+  // std::atomic<int> rgst_app_idx_incr_{0};
+  int rgst_app_idx_incr_{0};
+  std::set<int> retired_app_idx_;
+  int worker_shmkey_distance{-1};
 #endif
 
   // load managing thread
@@ -368,12 +375,6 @@ class FsProc {
   // NOTE: this will only be modified by the worker that decides to
   // start the checkpointing and monitor the completion of all checkpointing
   std::atomic_bool inGlobalCheckpointing;
-
-  // used for assign app id slot for the pre-allocated msg rings
-  // std::atomic<int> rgst_app_idx_incr_{0};
-  int rgst_app_idx_incr_{0};
-  std::set<int> retired_app_idx_;
-  int worker_shmkey_distance{-1};
 
   void cleanup();
 };

@@ -289,6 +289,7 @@ endif()
 
 if(CFS_DISK_LAYOUT_LEVELDB)
   target_compile_definitions(${MAIN_BIN_NAME} PRIVATE _EXTENT_FOR_LDB_)
+  target_compile_definitions(${MAIN_BIN_NAME} PRIVATE CFS_LIB_LDB)
 endif()
 
 if(CFS_DISK_LAYOUT_FILEBENCH)
@@ -371,6 +372,11 @@ set_target_properties(cfs PROPERTIES PUBLIC_HEADER "${CFS_PUB_HDR}")
 # libspdk.so) target_compile_definitions(cfs PRIVATE MIMIC_APP_ZC)
 # target_compile_definitions(cfs PRIVATE _CFS_LIB_PRINT_REQ_)
 target_compile_definitions(cfs PRIVATE NO_INCLUDE_JSON)
+
+if(CFS_DISK_LAYOUT_LEVELDB)
+    target_compile_definitions(cfs PRIVATE CFS_LIB_LDB)
+    target_compile_definitions(cfs PRIVATE _EXTENT_FOR_LDB_)
+endif()
 
 # target_link_libraries(cfs)
 target_link_libraries(cfs PRIVATE ${ABSL_LIBS})

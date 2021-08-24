@@ -1933,7 +1933,9 @@ void FsProcWorker::processClientControlPlaneReq(FsReq *req) {
       pid_t cur_pid = req->getApp()->getPid();
       if (getWid() == FsProcWorker::kMasterWidConst) {
         gFsProcPtr->g_app_shm_ids.HandleAppExit(cur_pid);
+#ifdef UFS_SOCK_LISTEN
         gFsProcPtr->RetireAppIdx(req->getApp()->GetAppIdx());
+#endif
         // gFsProcPtr->g_cred_table.HandleAppExit(cur_pid);
       }
       fileManager->closeAllFileDescriptors(cur_pid);
