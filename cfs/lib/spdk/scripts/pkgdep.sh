@@ -33,7 +33,7 @@ elif [ -f /etc/debian_version ]; then
 	# Additional dependencies for building docs
 	apt-get install -y doxygen mscgen graphviz
 	# Additional dependencies for SPDK CLI
-	apt-get install -y "python-configshell*"
+	apt-get install -y "python3-configshell*"
 elif [ -f /etc/SuSE-release ]; then
 	zypper install -y gcc gcc-c++ make cunit-devel libaio-devel libopenssl-devel \
 		git-core lcov python-base python-pep8 libuuid-devel sg3_utils
