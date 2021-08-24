@@ -1,0 +1,4 @@
+linux_intel64_gcc_cc7_libc2.27_kernel4.15.0_debug
+linux_intel64_gcc_cc7_libc2.27_kernel4.15.0_release
+vs2013
+*.js
