@@ -34,7 +34,7 @@ function test-data-dir-exist() {
 function cmpl-ufs() {
 	curr_dir=$PWD
 	cd $AE_REPO_DIR/cfs
-	sudo -rf build
+	sudo rm -rf build
 	bash ./tools/clean-cmake-cfs.sh
 	cd build
 
