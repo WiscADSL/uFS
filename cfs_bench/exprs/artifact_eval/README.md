@@ -239,3 +239,9 @@ The results would be printed to `stdout` and saved as `ycsb-X.data`. We recommen
 Since most of the experiments take hours to run, `sudo`'s authentication cache may expire, and `ae` would then pause somewhere and ask for `sudo` password. To alleviate this problem, we provide a `sudo` version of `ae` alias named `sudo-ae`, which only asks for `sudo` password once. Note that we don't encourage using `sudo` everywhere, so if running on CloudLab, where the password is not required for `sudo`, or you could manage to extend `sudo` authentication cache timeout, please use `ae` instead of `sudo-ae`. If you run `sudo-ae` once, you may need to always use `sudo-ae` because `ae` may not have permissions to clean up some files left by `sudo-ae`.
 
 If you are using another script to run `ae`, you may want to add `shopt -s expand_aliases` at the beginning of your script so that `ae`, as an alias instead of an executable binary, would be expanded in a non-interactive shell.
+
+## Fun Facts
+
+1. You may notice the source code directory is named as `cfs`. Who is cfs? Well, uFS has experienced several interactions, and the version you see is the third one. R.I.P. for our dear version a and b.
+
+2. Actually, version a and version b were not named as afs and bfs. They were called vsfs (very simple filesystem, later also commented by someone as "very stupid filesystem") and uffs (user-level fast filesystem). When the third iteration started, the poor author ran out of the idea of naming, so she decided to name future versions as cfs, dfs, efs, etc., and wished we won't have a ufs version of uFS. Fortunately, cfs survived.
