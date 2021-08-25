@@ -372,7 +372,10 @@ function ae-run() {
 	echo "Perform some pre-run cleaning: it may report some errors for files/processes not found, but it should be fine..."
 	set +e  # allow non-zero return value for file/process not found
 	sudo killall fsMain
+	sudo killall cfs_bench
 	sudo killall cfs_bench_coordinator
+	sudo killall testRWFsUtil
+	sudo killall fsProcOfflineCheckpointer
 	sudo rm -rf /ufs-*
 	sudo rm -rf /dev/shm/*
 	sudo ipcrm --all
