@@ -235,3 +235,7 @@ The results would be printed to `stdout` and saved as `ycsb-X.data`. We recommen
 - `AE_UFS_FILEBENCH_BRANCH`: customize which branch of uFS repository to use for filebench; filebench may need some customize configures (e.g. lift the limit of the number of fd)
 
 - `AE_EXT4_WAIT_AFTER_MOUNT`: customize how long (unit: second) to wait after mounting ext4. Ext4's mount includes some lazy operations, which would affect its performance. Thus, we wait for 300 seconds after mounting before further experiments.
+
+Since most of the experiments take hours to run, `sudo`'s authentication cache may expire, and `ae` would then pause somewhere and ask for `sudo` password. To alleviate this problem, we provide a `sudo` version of `ae` alias named `sudo-ae`, which only asks for `sudo` password once. Note that we don't encourage using `sudo` everywhere, so if running on CloudLab, where the password is not required for `sudo`, or you could manage to extend `sudo` authentication cache timeout, please use `ae` instead of `sudo-ae`. If you run `sudo-ae` once, you may need to always use `sudo-ae` because `ae` may not have permissions to clean up some files left by `sudo-ae`.
+
+If you are using another script to run `ae`, you may want to add `shopt -s expand_aliases` at the beginning of your script so that `ae`, as an alias instead of an executable binary, would be expanded in a non-interactive shell.

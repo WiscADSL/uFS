@@ -34,6 +34,7 @@ function test-data-dir-exist() {
 function cmpl-ufs() {
 	curr_dir=$PWD
 	cd $AE_REPO_DIR/cfs
+	sudo -rf build
 	bash ./tools/clean-cmake-cfs.sh
 	cd build
 
@@ -42,7 +43,7 @@ function cmpl-ufs() {
 	fi
 	make -j "$AE_CMPL_THREADS"
 
-	rm -rf $AE_REPO_DIR/cfs_bench/build
+	sudo rm -rf $AE_REPO_DIR/cfs_bench/build
 	mkdir -p $AE_REPO_DIR/cfs_bench/build
 	cd $AE_REPO_DIR/cfs_bench/build
 	cmake ..

@@ -6,6 +6,8 @@ set -e
 if [ $(id -u) = "0" ]; then
 	echo "It is NOT recommended to run this script as root!"
 	echo "Permission will be asked on demand"
+	echo "Please be aware that if you run this script with sudo once, you may want to always run it with sudo"
+	echo "Otherwise there might be permission issues"
 fi
 
 if [ ! "$1" = "init" ] && [ ! "$1" = "init-after-reboot" ] && [ ! "$1" = "cmpl" ] && [ ! "$1" = "run" ] && [ ! "$1" = "plot" ]; then
@@ -84,6 +86,10 @@ function ae-init-mount() {
 	touch ~/.ae_mount_done
 }
 
+# ADSL actually has most of software installed, but apt will handle redundancy
+# Some installments are not compatible with ADSL machines (e.g. they are already
+# installed on ADSL machines, but not from the same apt commands), we wrap them
+# with a condition check
 function ae-init-install() {
 	echo "Install: start..."
 	touch ~/.ae_env.sh
@@ -97,8 +103,10 @@ function ae-init-install() {
 	add-if-not-exist "export EDITOR='/usr/bin/vim'" ~/.ae_env.sh
 
 	# gcc-10 and g++-10
-	sudo apt-get -y install gcc-10 g++-10
-	sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
+	if [ "$1" = "cloudlab" ]; then # ADSL has gcc-10 installed already
+		sudo apt-get -y install gcc-10 g++-10
+		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
+	fi
 
 	# cmake
 	sudo apt-get -y install cmake cmake-curses-gui
@@ -125,10 +133,17 @@ function ae-init-install() {
 	sudo pip3 install ./z-plot; sudo rm -rf ./z-plot
 
 	# `bokeh` requires these drivers to render
-	sudo apt-get -y install chromium-browser chromium-chromedriver firefox-geckodriver
+	if [ "$1" = "cloudlab" ]; then # ADSL has these drivers installed already
+		sudo apt-get -y install chromium-browser chromium-chromedriver firefox-geckodriver
+	fi
 
 	# Some useful shell command:
 	add-if-not-exist "alias ae='bash $AE_SCRIPT_DIR/artifact_eval.sh'" ~/.ae_env.sh
+	# we don't encourage to use sudo everywhere, but in case someone wants to
+	# use another script to run this script, sudo's authentication cache may
+	# expire, espeically when experiments take hours. Thus, we introduce a sudo
+	# version alias, but please only used it when necessary
+	add-if-not-exist "alias sudo-ae='sudo -E bash $AE_SCRIPT_DIR/artifact_eval.sh'" ~/.ae_env.sh
 
 	# env vars required by benchmark scripts
 	if [ "$1" = "cloudlab" ]; then
@@ -296,10 +311,9 @@ function ae-init-after-reboot {
 		echo "TODO: disable CPU scaling on CloudLab machines..."
 	else  # ADSL machines
 		TARGET_FREQ="2900000"
-		for x in /sys/devices/system/cpu/*/cpufreq/
-		do
+		for x in /sys/devices/system/cpu/*/cpufreq; do
 			# NOTE: This will report error, but while verifying via `cat`, it has its effect there.
-			echo "$TARGET_FREQ" | sudo tee "$x/scaling_max_freq"
+			echo "$TARGET_FREQ" | sudo tee "$x/scaling_max_freq" > /dev/null 2>&1
 		done
 	fi
 	set -e
