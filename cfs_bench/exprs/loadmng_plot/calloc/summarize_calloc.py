@@ -47,7 +47,7 @@ class ExprReport(object):
         cur_dict[rpt_no] = avg_nc
 
     def report(self):
-        print(f'Experiment: {self.expr_name} num_rpt: {NUM_RPT}')
+        print(f'Experiment-{self.expr_name} (repeat {NUM_RPT} times)')
         total_qps_median_dict = {}
         avg_nc_median_dict = {}
         for dir_name, vals in self.dir_qps_dict.items():

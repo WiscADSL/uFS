@@ -90,11 +90,15 @@ function ae-init-install() {
 
 	# basic tools
 	sudo apt-get update
-	sudo apt-get -y install htop shellcheck valgrind cpufrequtils cloc
+	sudo apt-get -y install htop shellcheck valgrind cpufrequtils cloc python3-pip
 
 	# tmux
 	sudo apt-get -y install tmux
 	add-if-not-exist "export EDITOR='/usr/bin/vim'" ~/.ae_env.sh
+
+	# gcc-10 and g++-10
+	sudo apt-get -y install gcc-10 g++-10
+	sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
 
 	# cmake
 	sudo apt-get -y install cmake cmake-curses-gui
@@ -264,7 +268,9 @@ function ae-init() {
 	fi
 
 	echo "Init: DONE!"
-	echo "Please reboot the machine for some configurations to take effect"
+	echo "===================================================================="
+	echo "| Please reboot the machine for some configurations to take effect |"
+	echo "===================================================================="
 }
 
 function ae-init-after-reboot {

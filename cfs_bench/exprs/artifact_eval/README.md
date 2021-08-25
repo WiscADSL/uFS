@@ -14,11 +14,18 @@ The entry point of the artifact evaluation is the script `artifact_eval.sh`. It 
 
 Below are step-by-step instructions. Enjoy!
 
+## Dependencies
+
+The experiments require a machine with at least 20 physical cores and one NVMe SSD. To fully reproduce the results presented in our paper, an Intel Optane SSD is preferred.
+
+These scripts are tested on Ubuntu 20.04 LTS (CloudLab machines) and Ubuntu 18.04 LTS (ADSL machines). We use `gcc-10` and `g++-10` as compilers (will be installed by `artifact_eval.sh`). SPDK code included in this repository is based on SPDK 18.04.
+
 ## Initialization
 
 To begin with, run `artifact_eval.sh` with the current machine's type. Currently only support two types: `cloudlab` and `adsl`. If running on CloudLab, the machine must be of hardware type c6525-100g. If running on CloudLab:
 
 ```bash
+wget https://raw.githubusercontent.com/WiscADSL/uFS/main/cfs_bench/exprs/artifact_eval/artifact_eval.sh
 bash artifact_eval.sh init cloudlab
 ```
 
@@ -28,7 +35,7 @@ The initialization takes three steps:
 
 - `mount`: only on CloudLab machines; mount `/dev/nvme0n1p4` so that we could have enough disk space. It generates `~/.ae_mount_done` so that the next time running `artifact_eval.sh`, it will skip this step.
 
-- install: install dependencies and set some environment variables; once done, it generates `~/.ae_install_done` for similar purposes.
+- `install`: install dependencies and set some environment variables; once done, it generates `~/.ae_install_done` for similar purposes.
 
 - `config`: set some configurations e.g. lift memory limit so that SPDK could allocate enough huge page memory. It generates `~/.ae_config_done`.
 
@@ -57,11 +64,11 @@ ae cmpl microbench ufsnj
 
 # run single-threaded uFS
 ae run microbench ufs-single
-# The results could be accessed through the symbolic link `./AE_DATA/DATA_ufs-single`
+# results could be accessed through the symbolic link `./AE_DATA/DATA_microbench_ufs-single`
 
 # run no-journal ext4
 ae run microbench ext4nj
-# The results could be accessed through the symbolic link `./AE_DATA/DATA_ext4nj`
+# results in `./AE_DATA/DATA_microbench_ext4nj`
 
 # plot the results
 ae plot microbench single
@@ -79,11 +86,11 @@ ae cmpl microbench ufs
 
 # run multi-threaded uFS (default)
 ae run microbench ufs
-# the results could be accessed through the symbolic link `./AE_DATA/DATA_ufs`
+# results in `./AE_DATA/DATA_microbench_ufs`
 
 # run journaling ext4 (default)
 ae run microbench ext4
-# the results could be accessed through the symbolic link `./AE_DATA/DATA_ext4`
+# results in `./AE_DATA/DATA_microbench_ext4`
 
 # plot the results
 ae plot microbench multi
@@ -105,12 +112,12 @@ To run Varmail workload on multithreaded uFS and ext4 (fig. 8-left in uFS paper)
 # compile filebench with uFS APIs and varmail's configuration
 ae cmpl filebench varmail ufs
 ae run filebench varmail ufs
-# the results could be accessed through the symbolic link `./AE_DATA/DATA_filebench_varmail_ufs`
+# results in `./AE_DATA/DATA_filebench_varmail_ufs`
 
 # then ext4 (also need recompile filebench)
 ae cmpl filebench varmail ext4
 ae run filebench varmail ext4
-# the results could be accessed through the symbolic link `./AE_DATA/DATA_filebench_varmail_ext4`
+# results in `./AE_DATA/DATA_filebench_varmail_ext4`
 
 # plot
 ae plot filebench varmail
@@ -127,9 +134,8 @@ To run Webserver workload on uFS with different client cache hit rate and ext4 (
 ae cmpl filebench webserver ufs
 ae run filebench webserver ufs
 ae cmpl filebench webserver ext4
-ae cmpl filebench webserver ext4
-# the results could be accessed through the symbolic links
-# `./AE_DATA/DATA_filebench_webserver_ufs` and `./AE_DATA/DATA_filebench_webserver_ext4`
+ae run filebench webserver ext4
+# results in `./AE_DATA/DATA_filebench_webserver_ufs` and `./AE_DATA/DATA_filebench_webserver_ext4`
 
 # plot
 ae plot filebench webserver
@@ -154,8 +160,7 @@ To compare uFS load balancing performance with other alternative settings (fig. 
 ```bash
 # run load balancing benchmarks (three policies: ufs, ufs_max, ufs_rr)
 ae run loadmng ldbal
-# the results could be accessed through the symbolic link `./AE_DATA/DATA_loadmng_ufs`,
-# `./AE_DATA/DATA_loadmng_max`, and `./AE_DATA/DATA_loadmng_rr`
+# results in `./AE_DATA/DATA_loadmng_ufs`, `./AE_DATA/DATA_loadmng_max`, and `./AE_DATA/DATA_loadmng_rr`
 
 ae plot loadmng ldbal
 ```
@@ -169,7 +174,7 @@ To compare uFS core allocation performance with other alternative settings (fig.
 ```bash
 # run core allocation benchmarks (two policies: ufs and ufs_max; two workload changing patterns: gradual and bursty)
 ae run loadmng calloc
-# the results could be accessed through the symbolic link `./AE_DATA/DATA_calloc`
+# results in `./AE_DATA/DATA_loadmng_calloc`
 
 # this plot may take a while as there is a large number of logs to process
 ae plot loadmng calloc
@@ -184,7 +189,7 @@ To demonstrate uFS dynamic behavior under varying workload (fig. 11 in uFS paper
 ```bash
 # run the demonstration of uFS under dynamic workload
 ae run loadmng dynamic
-# the results could be accessed through the symbolic link `./AE_DATA/DATA_dynamic`
+# results in `./AE_DATA/DATA_loadmng_dynamic`
 
 ae plot loadmng dynamic
 ```
@@ -200,11 +205,11 @@ We use 6 YCSB traces, named as `ycsb-X` for `X` being `a` to `f`. One could run 
 ```bash
 ae cmpl leveldb ufs
 ae run leveldb all ufs
-# the results could be accessed through `./AE_DATA/DATA_leveldb_ycsb-X_ufs` for `X` being `a` to `f`
+# results in `./AE_DATA/DATA_leveldb_ycsb-X_ufs` for `X` being `a` to `f`
 
 ae cmpl leveldb ext4
 ae run leveldb all ext4
-# the results could be accessed through `./AE_DATA/DATA_leveldb_ycsb-X_ext4` for `X` being `a` to `f`
+# results in `./AE_DATA/DATA_leveldb_ycsb-X_ext4` for `X` being `a` to `f`
 
 # plot them all
 for X in 'a' 'b' 'c' 'd' 'e' 'f'
