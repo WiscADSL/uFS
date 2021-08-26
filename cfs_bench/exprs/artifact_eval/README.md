@@ -14,22 +14,29 @@ The entry point of the artifact evaluation is the script `artifact_eval.sh`. It 
 
 Below are step-by-step instructions. Enjoy!
 
-## Dependencies
+## Requirements
 
 The experiments require a machine with at least 20 physical cores and one NVMe SSD. To fully reproduce the results presented in our paper, an Intel Optane SSD is preferred.
 
-These scripts are tested on Ubuntu 20.04 LTS (CloudLab machines) and Ubuntu 18.04 LTS (ADSL machines). We use `gcc-10` and `g++-10` as compilers (will be installed by `artifact_eval.sh`). SPDK code included in this repository is based on SPDK 18.04.
+These scripts are tested on Ubuntu 20.04 LTS (CloudLab machines) and Ubuntu 18.04 LTS (ADSL machines), both with kernel version 5.4. We use `gcc-10` and `g++-10` as compilers (will be installed by `artifact_eval.sh`). SPDK code included in this repository is based on SPDK 18.04.
 
 ## Initialization
 
-To begin with, run `artifact_eval.sh` with the current machine's type. Currently only support two types: `cloudlab` and `adsl`. If running on CloudLab, the machine must be of hardware type c6525-100g. If running on CloudLab:
+To begin with, run `artifact_eval.sh` with the current machine's type. Currently only support three types: `cloudlab`, `adsl`, and `other`. If running on CloudLab, the machine must be of hardware type c6525-100g. If running on CloudLab:
 
 ```bash
 wget https://raw.githubusercontent.com/WiscADSL/uFS/main/cfs_bench/exprs/artifact_eval/artifact_eval.sh
 bash artifact_eval.sh init cloudlab
 ```
 
-If running on a machine managed by ADSL, use `adsl` instead.
+If running on a machine managed by ADSL, use `adsl` instead. If running on other machines, use `other` and must provide an environment variable `AE_SSD_NAME` for the name of NVMe SSD to use. For example
+
+```bash
+export AE_SSD_NAME=nvme0n1
+bash artifact_eval.sh init other
+```
+
+If you are not sure about your SSD's name, try `lsblk`.
 
 The initialization takes three steps:
 
@@ -44,10 +51,10 @@ It will also create `~/.ae_env.sh` with some environment variables required by t
 After rebooting the machine, run
 
 ```bash
-ae init-after-reboot cloudlab
+ae init-after-reboot cloudlab # OR adsl/other
 ```
 
-This command will set up environments for later benchmarking e.g. disabling hyperthreading and reserving huge pages for SPDK (which should be done immediately after rebooting so that the kernel still have hugepage memory available). This finally completes the environment initialized. If for any reason, the machine reboots again, `init-after-reboot` should be rerun before any benchmarking.
+This command will set up benchmarking environments that don't survive from a reboot e.g. disabling hyperthreading and reserving huge pages for SPDK (which should be done immediately after rebooting so that the kernel still has hugepage memory available). This finally completes the environment initialized. If for any reason, the machine reboots again, `init-after-reboot` should be rerun before any benchmarking. For stable results, we do recommend rebooting machines between experiments.
 
 ## Microbenchmark
 

@@ -103,7 +103,7 @@ function ae-init-install() {
 	add-if-not-exist "export EDITOR='/usr/bin/vim'" ~/.ae_env.sh
 
 	# gcc-10 and g++-10
-	if [ "$1" = "cloudlab" ]; then # ADSL has gcc-10 installed already
+	if [ ! "$1" = "adsl" ]; then # ADSL has gcc-10 installed already
 		sudo apt-get -y install gcc-10 g++-10
 		sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-10 100 --slave /usr/bin/g++ g++ /usr/bin/g++-10 --slave /usr/bin/gcov gcov /usr/bin/gcov-10
 	fi
@@ -133,7 +133,7 @@ function ae-init-install() {
 	sudo pip3 install ./z-plot; sudo rm -rf ./z-plot
 
 	# `bokeh` requires these drivers to render
-	if [ "$1" = "cloudlab" ]; then # ADSL has these drivers installed already
+	if [ ! "$1" = "adsl" ]; then # ADSL has these drivers installed already
 		sudo apt-get -y install chromium-browser chromium-chromedriver firefox-geckodriver
 	fi
 
@@ -147,10 +147,26 @@ function ae-init-install() {
 
 	# env vars required by benchmark scripts
 	if [ "$1" = "cloudlab" ]; then
-		add-if-not-exist 'export SSD_NAME="nvme1n1"' ~/.ae_env.sh
+		if [ -z "$AE_SSD_NAME" ]; then
+			export AE_SSD_NAME="nvme1n1"
+		fi
+	elif [ "$1" = "adsl" ]; then
+		if [ -z "$AE_SSD_NAME" ]; then
+			export AE_SSD_NAME="nvme0n1"
+		fi
 	else
-		add-if-not-exist 'export SSD_NAME="nvme0n1"' ~/.ae_env.sh
+		if [ -z "$AE_SSD_NAME" ]; then
+			echo 'Please provide the name of SSD through environment variable `AE_SSD_NAME` e.g. nvme0n1'
+			echo 'To find the name, try `lsblk`'
+			exit 1
+		fi
+		if [ ! -e "/dev/$AE_SSD_NAME" ]; then
+			echo "Detect \`AE_SSD_NAME\`: $AE_SSD_NAME"
+			echo "but \`/dev/$AE_SSD_NAME\` not found"
+			exit 1
+		fi
 	fi
+	add-if-not-exist "export SSD_NAME=${AE_SSD_NAME}" ~/.ae_env.sh
 	add-if-not-exist 'export KFS_MOUNT_PATH="/ssd-data"' ~/.ae_env.sh
 	add-if-not-exist 'export KFS_DATA_DIR="${KFS_MOUNT_PATH}/bench"' ~/.ae_env.sh
 	add-if-not-exist 'export CFS_ROOT_DIR="${HOME}/workspace/uFS"' ~/.ae_env.sh
@@ -229,19 +245,24 @@ function ae-init-config() {
 }
 
 function ae-init() {
-	if [ ! "$1" = "cloudlab" ] && [ ! "$1" = "adsl" ]; then
-		echo "Usage: ae init [ cloudlab | adsl ]"
+	if [ ! "$1" = "cloudlab" ] && [ ! "$1" = "adsl" ] && [ ! "$1" = "other" ]; then
+		echo "Usage: ae init [ cloudlab | adsl | other ]"
 		echo "  Specify which machine this script is running on:"
 		echo "    cloudlab: a machine of hardware type c6525-100g in CloudLab"
 		echo "    adsl:     a machine managed by ADSL (have some environment prepared already)"
+		echo "    other:    other machines (checkout \"Requirements\" on README)"
 		exit 1
 	fi
 
 	echo "=== Welcome to the artifact evaluation of uFS! ==="
 	echo "Init: start..."
 
-	# if not mount
-	if [ ! -f ~/.ae_mount_done ] && [ "$1" = "cloudlab" ]; then
+	if [ "$1" = "other" ]; then
+		set +e # best-effort; won't stop if anything fails
+	fi
+
+	# if not mount (only on Cloudlab)
+	if [ "$1" = "cloudlab" ] && [ ! -f ~/.ae_mount_done ]; then
 		ae-init-mount "$@"
 	else
 		echo "Detect mount has been done; skip..."
@@ -282,6 +303,8 @@ function ae-init() {
 		echo "Detect config has been done; skip..."
 	fi
 
+	set -e
+
 	echo "Init: DONE!"
 	echo "===================================================================="
 	echo "| Please reboot the machine for some configurations to take effect |"
@@ -289,11 +312,12 @@ function ae-init() {
 }
 
 function ae-init-after-reboot {
-	if [ ! "$1" = "cloudlab" ] && [ ! "$1" = "adsl" ]; then
-		echo "Usage: ae init-after-reboot [ cloudlab | adsl ]"
+	if [ ! "$1" = "cloudlab" ] && [ ! "$1" = "adsl" ] && [ ! "$1" = "other" ]; then
+		echo "Usage: ae init-after-reboot [ cloudlab | adsl | other ]"
 		echo "  Specify which machine this script is running on:"
 		echo "    cloudlab: a machine of hardware type c6525-100g in CloudLab"
 		echo "    adsl:     a machine managed by ADSL (have some environment prepared already)"
+		echo "    other:    other machines (checkout \"Requirements\" on README)"
 		exit 1
 	fi
 
@@ -309,7 +333,7 @@ function ae-init-after-reboot {
 	set +e
 	if [ "$1" = "cloudlab" ]; then
 		echo "TODO: disable CPU scaling on CloudLab machines..."
-	else  # ADSL machines
+	else  # ADSL machines or other machines
 		TARGET_FREQ="2900000"
 		for x in /sys/devices/system/cpu/*/cpufreq; do
 			# NOTE: This will report error, but while verifying via `cat`, it has its effect there.
