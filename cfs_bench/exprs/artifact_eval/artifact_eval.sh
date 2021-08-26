@@ -287,6 +287,11 @@ function ae-init() {
 		echo "Detect mount has been done; skip..."
 	fi
 
+	# install Git Large File Storage first
+	# so large files will be pulled automatically in `git clone`
+	sudo apt-get update
+	sudo apt-get -y install git-lfs
+
 	# Then download codebase to the workspace if the codebase is not found
 	if [ ! -d "$AE_REPO_DIR" ]; then
 		echo "uFS repository is not detected, start downloading..."
