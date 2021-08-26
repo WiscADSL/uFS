@@ -378,6 +378,10 @@ if(CFS_DISK_LAYOUT_LEVELDB)
     target_compile_definitions(cfs PRIVATE _EXTENT_FOR_LDB_)
 endif()
 
+if(CFS_DISK_LAYOUT_FILEBENCH)
+    target_compile_definitions(cfs PRIVATE _EXTENT_FOR_FILEBENCH_)
+endif()
+
 # target_link_libraries(cfs)
 target_link_libraries(cfs PRIVATE ${ABSL_LIBS})
 

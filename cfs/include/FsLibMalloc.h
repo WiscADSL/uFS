@@ -354,8 +354,10 @@ class FsLibMemMng {
   // default buffer configuration
   constexpr static int kBlockSizeNum = 3;
   constexpr static fslib_malloc_mem_sz_t kPerSizeTotalBytes[] = {
-#if defined(_EXTENT_FOR_LDB_) || defined(_EXTENT_FOR_FILEBENCH_)
+#if defined(_EXTENT_FOR_LDB_)
       2UL * 1024 * 1024 * 1024, /* 2G for 8K pages*/
+#elif defined(_EXTENT_FOR_FILEBENCH_)
+      1UL * 1024 * 1024 * 1024, /* 1G for 8K pages*/
 #else
       256 * 1024 * 1024, /* 256M for 8K pages*/
 #endif
