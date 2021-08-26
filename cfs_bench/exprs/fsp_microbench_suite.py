@@ -11,6 +11,7 @@ import cfs_test_common as cfs_common
 # FSP whole set of microbenchmark
 
 DEV_NAME = "/dev/" + os.environ["SSD_NAME"]
+PCIE_ADDR = os.environ["SSD_PICE_ADDR"]
 
 def get_host_name():
     return os.uname().nodename
@@ -29,19 +30,25 @@ def get_spdk_setup_bin():
     return setup_bin
 
 
+# This way to get NUMA number is not very clean... `lscpu` is really for human,
+# not for machine, but it works on all the machines we used...
+# Maybe update it in the future
+def get_numa_node_num():
+    check_numa_out = subprocess.check_output(
+        "lscpu | grep -i NUMA", shell=True, encoding='utf-8').strip().split("\n")
+    # first line should be like "NUMA node(s):         2"
+    # rest of lines should be mapping of each NUMA nodes to core ids
+    numa_node_num = int(check_numa_out[0].split()[-1])
+    assert numa_node_num == len(check_numa_out) - 1
+    return numa_node_num
+
+
 def setup_spdk(numa_node_num=None):
     setup_bin = '{}/{}'.format(cfs_common.get_cfs_root_dir(),
                                'cfs/lib/spdk/scripts/setup.sh')
-    PCIE_ADDR = '0000:3b:00.0'
-    if get_host_name() == 'oats':
-        PCIE_ADDR = '0000:5e:00.0'
-    if 'cloudlab' in get_host_name() and 'utah' in get_host_name():
-        PCIE_ADDR = '0000:c6:00.0'
-        if numa_node_num is None:
-            numa_node_num = 1
     if numa_node_num is None:
-        numa_node_num = 2
-    print(PCIE_ADDR)
+        numa_node_num = get_numa_node_num()
+    print(f"SSD PCIe Address: {PCIE_ADDR}")
     numa_node_list = range(numa_node_num)
     for no in numa_node_list:
         ret = subprocess.call(

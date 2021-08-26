@@ -16,7 +16,7 @@ Below are step-by-step instructions. Enjoy!
 
 ## Requirements
 
-The experiments require a machine with at least 20 physical cores and one NVMe SSD. To fully reproduce the results presented in our paper, an Intel Optane SSD is preferred.
+The experiments require a machine with at least 20 physical cores (on one NUMA node) and one NVMe SSD. To fully reproduce the results presented in our paper, an Intel Optane SSD is preferred.
 
 These scripts are tested on Ubuntu 20.04 LTS (CloudLab machines) and Ubuntu 18.04 LTS (ADSL machines), both with kernel version 5.4. We use `gcc-10` and `g++-10` as compilers (will be installed by `artifact_eval.sh`). SPDK code included in this repository is based on SPDK 18.04.
 
@@ -29,14 +29,15 @@ wget https://raw.githubusercontent.com/WiscADSL/uFS/main/cfs_bench/exprs/artifac
 bash artifact_eval.sh init cloudlab
 ```
 
-If running on a machine managed by ADSL, use `adsl` instead. If running on other machines, use `other` and must provide an environment variable `AE_SSD_NAME` for the name of NVMe SSD to use. For example
+If running on a machine managed by ADSL, use `adsl` instead. If running on other machines, use `other` and must provide two environment variables: `AE_SSD_NAME` for the name of NVMe SSD and `AE_SSD_PICE_ADDR` for its PCIe address. For example
 
 ```bash
-export AE_SSD_NAME=nvme0n1
+export AE_SSD_NAME='nvme0n1'
+export AE_SSD_PICE_ADDR='0000:3b:00.0'
 bash artifact_eval.sh init other
 ```
 
-If you are not sure about your SSD's name, try `lsblk`.
+If you are not sure about your SSD's name, try `lsblk`. If you are not sure about PICe address of the SSD, try [this script](../../../cfs/lib/spdk/scripts/gen_nvme.sh).
 
 The initialization takes three steps:
 

@@ -150,13 +150,26 @@ function ae-init-install() {
 		if [ -z "$AE_SSD_NAME" ]; then
 			export AE_SSD_NAME="nvme1n1"
 		fi
+		if [ -z "$AE_SSD_PICE_ADDR" ]; then
+			export AE_SSD_PICE_ADDR="0000:c6:00.0"
+		fi
 	elif [ "$1" = "adsl" ]; then
 		if [ -z "$AE_SSD_NAME" ]; then
 			export AE_SSD_NAME="nvme0n1"
 		fi
+		if [ -z "$AE_SSD_PICE_ADDR" ]; then
+			if [ "$(hostname)" = "bumble" ]; then
+				export AE_SSD_PICE_ADDR="0000:3b:00.0"
+			elif [ "$(hostname)" = "oats" ]; then
+				export AE_SSD_PICE_ADDR="0000:5e:00.0"
+			else
+				echo "Unknown ADSL machine. Please provide PCIe address through environment variable \`AE_SSD_PICE_ADDR\` e.g. 0000:3b:00.0"
+				exit 1
+			fi
+		fi
 	else
 		if [ -z "$AE_SSD_NAME" ]; then
-			echo 'Please provide the name of SSD through environment variable `AE_SSD_NAME` e.g. nvme0n1'
+			echo 'Please provide SSD name through environment variable `AE_SSD_NAME` e.g. nvme0n1'
 			echo 'To find the name, try `lsblk`'
 			exit 1
 		fi
@@ -165,8 +178,14 @@ function ae-init-install() {
 			echo "but \`/dev/$AE_SSD_NAME\` not found"
 			exit 1
 		fi
+		if [ -z "$AE_SSD_PICE_ADDR" ]; then
+			echo 'Please provide PCIe address of the SSD through environment variable `AE_SSD_PICE_ADDR` e.g. 0000:3b:00.0'
+			echo 'To find the name, try `cfs/lib/spdk/scripts/gen_nvme.sh`'
+			exit 1
+		fi
 	fi
 	add-if-not-exist "export SSD_NAME=${AE_SSD_NAME}" ~/.ae_env.sh
+	add-if-not-exist "export SSD_PICE_ADDR=${AE_SSD_PICE_ADDR}" ~/.ae_env.sh
 	add-if-not-exist 'export KFS_MOUNT_PATH="/ssd-data"' ~/.ae_env.sh
 	add-if-not-exist 'export KFS_DATA_DIR="${KFS_MOUNT_PATH}/bench"' ~/.ae_env.sh
 	add-if-not-exist 'export CFS_ROOT_DIR="${HOME}/workspace/uFS"' ~/.ae_env.sh
