@@ -1167,7 +1167,7 @@ int64_t FsImpl::checkAndFlushDirty(FsProcWorker *worker) {
   int64_t numFlushed = 0;
   // flush DataBuffer
   if (dataBlockBuf_->checkIfNeedBgFlush()) {
-#if (defined _EXTENT_FOR_LDB_) || (defined _EXTENT_FOR_FILEBENCH_)
+#if defined(_EXTENT_FOR_LDB_) || defined(_EXTENT_FOR_FILEBENCH_)
     throw std::runtime_error("Error, we don't want bg flush at all!");
 #endif
     // SPDLOG_INFO("[BG_FLUSH] flush dirty buffer (BG)");
