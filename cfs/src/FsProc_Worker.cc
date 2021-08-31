@@ -1193,7 +1193,9 @@ int FsProcWorker::submitFsReqCompletion(FsReq *fsReq) {
   }
 
   fsReq->stopOnCpuTimer();
-  if (do_check_inode_migration) {
+
+  if (do_check_inode_migration &&
+      fileManager->fsImpl_->BufferSlotAllowMigrate()) {
     auto inode = fsReq->getTargetInode();
     if (inode != nullptr && inode->inodeData->type == T_FILE) {
       auto cur_ino = inode->i_no;

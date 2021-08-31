@@ -517,6 +517,7 @@ class FsImpl {
       InMemInode *inode, std::unordered_set<BlockBufferItem *> &items);
   void installInodeDataBlockBufferSlot(
       InMemInode *inode, const std::unordered_set<BlockBufferItem *> &items);
+  bool BufferSlotAllowMigrate() { return datablock_buf_allow_migrate; }
 
   int dumpAllInodesToFile(const char *fname);
 
@@ -564,6 +565,8 @@ class FsImpl {
   BlockBuffer *inodeSectorBuf_{nullptr};
   BlockBuffer *dataBlockBuf_{nullptr};
   float dataBlockBufDirtyFlushRato_{0.9};
+  static constexpr block_no_t kBufferSlowLowWatermark = 5000;
+  bool datablock_buf_allow_migrate = true;
 
 #ifndef NONE_MT_LOCK
   std::atomic_flag iMapBlockLock;

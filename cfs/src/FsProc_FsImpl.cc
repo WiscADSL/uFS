@@ -1741,6 +1741,10 @@ void FsImpl::splitInodeDataBlockBufferSlot(
     InMemInode *inode, std::unordered_set<BlockBufferItem *> &items) {
   assert(inode->i_no == inode->inodeData->i_no);
   dataBlockBuf_->splitBufferItemsByIndex(inode->i_no, items);
+  if (dataBlockBuf_->GetCurrentItemNum() <= kBufferSlowLowWatermark) {
+    fprintf(stderr, "migrate disallow due to slots\n");
+    datablock_buf_allow_migrate = false;
+  }
 }
 
 void FsImpl::installInodeDataBlockBufferSlot(

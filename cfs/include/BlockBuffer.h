@@ -211,6 +211,7 @@ class BlockBuffer {
   void setIfReportStats(bool b) { reportStat = b; }
 
   int getBlockSize() { return blockSize; }
+  auto GetCurrentItemNum() { return _cache_items_list.size(); }
 
   void setFgFlushLimit(int lmt) { numFgFlushInflightLimit = lmt; }
 

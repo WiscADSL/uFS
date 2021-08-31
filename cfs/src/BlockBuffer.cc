@@ -254,7 +254,7 @@ BlockBufferItem *BlockBuffer::getBlock(block_no_t blockNo, int &lockGrabbed,
         SPDLOG_ERROR(
             "LRU buffer cannot find any block to replace. ListSize:{} ",
             _cache_items_list.size());
-        throw std::runtime_error("LRU buffer all dirty");
+        throw std::runtime_error(bufferName + " - LRU buffer all dirty");
 #ifdef BLK_BUF_DEBUG
         SPDLOG_INFO(" dirtyCnt:{} lockedCnt:{}", dirtyCnt, lockedCnt);
 #endif  // BLK_BUF_DEBUG
