@@ -1425,7 +1425,7 @@ def process_log_dir(args):
             print('no:{} avg:{} median:{}'.format(
                 expr_no, cur_avg, cur_median))
         df = pd.DataFrame(list(zip(expr_no_list, avg_list, median_list)), columns=[
-            'expr_no', 'avg', 'median'])
+            'expr_no', 'avg', 'med_val'])
         df.to_csv('{}/stable_time.csv'.format(args.log_dir), index=False)
     perf_df = process_log_dir_perf(args, expr_no_list)
     perf_df.to_csv('{}/perf.csv'.format(args.log_dir), index=False)
