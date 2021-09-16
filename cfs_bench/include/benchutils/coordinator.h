@@ -5,6 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <stdexcept>
+
 #include "shmipc/shmipc.h"
 
 /* coordinator shm layout - 8 byte for each
