@@ -18,6 +18,7 @@ option(CFS_START_ALL_WORKERS_ON_INIT "fsMain starts all workers on init" OFF)
 # acts as if checkpointing happened and resets the journal super block.
 option(CFS_JOURNAL_DISABLE_CHKPT "disables checkpointing (unsafe)" OFF)
 option(UFS_EXPR_LBNC "enable load management info output (for benchmark)" OFF)
+option(USE_RAM_DEV "use ram as block device" OFF)
 
 set(CMAKE_CXX_FLAGS_RelWithAssert "-O3 -Wall")
 
@@ -307,6 +308,10 @@ endif()
 
 if(UFS_EXPR_LBNC)
   target_compile_definitions(${MAIN_BIN_NAME} PRIVATE "UFS_EXPR_LBNC")
+endif()
+
+if(USE_RAM_DEV)
+  target_compile_definitions(${MAIN_BIN_NAME} PRIVATE "USE_RAM_DEV")
 endif()
 
 find_package(Threads)

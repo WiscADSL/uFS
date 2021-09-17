@@ -6,6 +6,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 
 #include "FsProc_Fs.h"
@@ -1033,7 +1034,11 @@ int64_t FsImpl::allocateDataBlocks(FsReq *fsReq, InMemInode *inode,
                 goto FSIMPL_BMAP_ALLOC_RETRY_ONCE_FROM_START;
             }
             bmapBlockBuf_->releaseBlock(curBmapItemPtr);
-          } else {
+          } else {  // !isInMem()
+#ifdef USE_RAM_DEV
+            SPDLOG_INFO("idx:{} bmap need to read bno:{}", idx_,
+                        curBmapBlockNo);
+#endif
 #ifndef NONE_MT_LOCK
             // need to read the bitmap block
             bmapLock.clear(std::memory_order_release);
@@ -1084,7 +1089,11 @@ int64_t FsImpl::allocateDataBlocks(FsReq *fsReq, InMemInode *inode,
               goto FSIMPL_BMAP_ALLOCATE_SUCCESS;
             }
             bmapBlockBuf_->releaseBlock(curBmapItemPtr);
-          } else {
+          } else {  // !isInMem()
+#ifdef USE_RAM_DEV
+            SPDLOG_INFO("idx:{} bmap need to read bno:{}", idx_,
+                        curBmapBlockNo);
+#endif
 #ifndef NONE_MT_LOCK
             // need to read the bitmap block
             bmapLock.clear(std::memory_order_release);
@@ -1125,7 +1134,11 @@ int64_t FsImpl::allocateDataBlocks(FsReq *fsReq, InMemInode *inode,
               goto FSIMPL_BMAP_ALLOCATE_SUCCESS;
             }
             bmapBlockBuf_->releaseBlock(curBmapItemPtr);
-          } else {
+          } else {  // !isInMem()
+#ifdef USE_RAM_DEV
+            SPDLOG_INFO("idx:{} bmap need to read bno:{}", idx_,
+                        curBmapBlockNo);
+#endif
 #ifndef NONE_MT_LOCK
             bmapLock.clear(std::memory_order_release);
 #endif
@@ -1379,6 +1392,36 @@ BlockBufferItem *FsImpl::getBlockForIndex(BlockBuffer *blockBuf,
                                           uint32_t index) {
   return getBlock(blockBuf, blockNo, fsReq, doSubmit, doBlockSubmit,
                   canOverwritten, index);
+}
+
+int FsImpl::BlockingFetchBlock(BlockBuffer *block_buf, block_no_t block_no,
+                               FsProcWorker *worker_handler) {
+  int lock_grabbed = BLOCK_BUF_LOCK_GRAB_DEFAULT;
+  bool need_flush = false;
+  auto item = block_buf->getBlock(block_no, lock_grabbed, need_flush);
+  assert(!need_flush);
+  if (item == nullptr || (lock_grabbed != BLOCK_BUF_LOCK_GRAB_YES)) {
+    throw std::runtime_error("cannot blocking if we don't have lock");
+  }
+  int is_inmem = 0;
+  if (!item->isInMem()) {
+    // do blocking io (lock is held)
+    if (block_buf->getBlockSize() == (SSD_SEC_SIZE)) {
+      throw std::runtime_error("only support data block buffer");
+    }
+    BlockReq req(block_no, nullptr, item->getBufPtr(),
+                 FsBlockReqType::READ_BLOCKING);
+    int rt = worker_handler->submitDirectReadDevReq(&req);
+    if (rt < 0) {
+      throw std::runtime_error("cannot do blocking read");
+    }
+    item->blockFetchedCallback();
+    worker_handler->jmgr->CopyBufToStableDataBitmap(block_no,
+                                                    item->getBufPtr());
+  } else {
+    is_inmem = 1;
+  }
+  return is_inmem;
 }
 
 BlockBufferItem *FsImpl::getBlock(BlockBuffer *blockBuf, uint32_t blockNo,
@@ -1667,6 +1710,45 @@ void FsImpl::_fsExitFlushSingleSectorBuffer(FsProcWorker *procHandler,
                  FsBlockReqType::WRITE_BLOCKING_SECTOR);
     rc = procHandler->submitDirectWriteDevReq(&req);
     assert(rc == 0);
+  }
+}
+
+void FsImpl::WarmBmapBuffer(FsProcWorker *proc_handler) {
+  // warmup the first extent
+  int extent_idx = 0;
+  uint32_t cur_max_bmap_blocks = 0;
+  uint32_t cur_bmap_block_disk_blk_no;
+  const int k_num_first_block = 10020;
+  cur_bmap_block_disk_blk_no =
+      get_bmap_start_block_for_worker(idx_) +
+      getDataBMapStartBlockNoForExtentArrIdx(
+          extent_idx, get_dev_bmap_num_blocks_for_worker(idx_),
+          cur_max_bmap_blocks);
+  if (cur_max_bmap_blocks * 4096 < k_num_first_block) {
+    throw std::runtime_error("cur_max_bmap_blocks:" +
+                             std::to_string(cur_max_bmap_blocks));
+  }
+  auto cur_alloc_unit = extentArrIdx2BlockAllocUnit(extent_idx);
+  for (auto i = 0; i < k_num_first_block / 4096 + 1; i += cur_alloc_unit) {
+    auto cur_bmap_block_no = cur_bmap_block_disk_blk_no + i;
+    auto rt =
+        BlockingFetchBlock(bmapBlockBuf_, cur_bmap_block_no, proc_handler);
+    if (rt != 0) {
+      throw std::runtime_error("block already in mem");
+    }
+  }
+  // ok, then we warmup one file until the biggest unit
+  for (extent_idx = 1; extent_idx < NEXTENT_ARR; extent_idx++) {
+    cur_bmap_block_disk_blk_no =
+        get_bmap_start_block_for_worker(idx_) +
+        getDataBMapStartBlockNoForExtentArrIdx(
+            extent_idx, get_dev_bmap_num_blocks_for_worker(idx_),
+            cur_max_bmap_blocks);
+    auto rt = BlockingFetchBlock(bmapBlockBuf_, cur_bmap_block_disk_blk_no,
+                                 proc_handler);
+    if (rt != 0) {
+      throw std::runtime_error("block already in mem");
+    }
   }
 }
 

@@ -3087,6 +3087,9 @@ int FsProcWorkerMaster::initInMemDataAfterDevReady() {
     char *inodeBitmapDevBuf = devBufMemPtr + (imapStartNo + i) * BSIZE;
     jmgr->CopyBufToStableInodeBitmap(imapStartNo + i, inodeBitmapDevBuf);
   }
+#ifdef USE_RAM_DEV
+  fileManager->WarmBmap(this);
+#endif
   return 0;
 }
 
@@ -3554,6 +3557,10 @@ void FsProcWorkerServant::workerRunLoop() {
   }
 
   initJournalManager();
+
+#ifdef USE_RAM_DEV
+  fileManager->WarmBmap(this);
+#endif
 
   // TODO (jingliu): directly install the credential info or let the
   // split/join message pass the corresponding info? - Install it directly

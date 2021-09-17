@@ -32,6 +32,7 @@ class FileMng {
 
   // Flush metadata buffers when FS exits
   void flushMetadataOnExit();
+  void WarmBmap(FsProcWorker *handler) { fsImpl_->WarmBmapBuffer(handler); }
 
   // At runtime, check and flush the buffer
   // return the number of items being flushed.

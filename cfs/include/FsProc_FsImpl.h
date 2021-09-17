@@ -13,6 +13,7 @@
 #include "FsProc_PageCache.h"
 #include "FsProc_TLS.h"
 #include "FsProc_WorkerStats.h"
+#include "typedefs.h"
 
 //
 class FsProcWorker;
@@ -633,6 +634,8 @@ class FsImpl {
                                     FsReq *fsReq, bool doSubmit,
                                     bool doBlockSubmit, bool &canOverwritten,
                                     uint32_t index);
+  int BlockingFetchBlock(BlockBuffer *block_buf, block_no_t block_no,
+                         FsProcWorker *worker_handler);
   BlockBufferItem *getBlock(BlockBuffer *blockBuf, uint32_t blockNo,
                             FsReq *fsReq);
   BlockBufferItem *getBlock(BlockBuffer *blockBuf, uint32_t blockNo,
@@ -677,6 +680,8 @@ class FsImpl {
                                             bool dbg = false);
   static void _fsExitFlushSingleSectorBuffer(FsProcWorker *procHandler,
                                              BlockBuffer *blkbuf);
+  // warmup bmap buffer by pre-fetching bmap blocks when starting fs
+  void WarmBmapBuffer(FsProcWorker *proc_handler);
   // helper function to print super block information.
   void printSuperBlock();
 

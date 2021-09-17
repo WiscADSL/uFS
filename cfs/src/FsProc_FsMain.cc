@@ -189,6 +189,13 @@ int main(int argc, char **argv) {
 #else
   std::cout << "FS_ENABLE_ALLOC_READ_RA - OFF" << std::endl;
 #endif
+
+#ifdef USE_RAM_DEV
+  std::cout << "USE_RAM_DEV - ON" << std::endl;
+#else
+  std::cout << "USE_RAM_DEV - OFF" << std::endl;
+#endif
+
   logFeatureMacros();
   std::vector<int> shmBaseOffsetVec = {0};
   std::vector<int> workerCores;  // empty by default
