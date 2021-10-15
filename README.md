@@ -54,7 +54,7 @@ After building uFS, please reboot the machine and we recommand always run `ae in
 
 ## Artifact and Experiments of the Paper
 
-We provide full automation for building, running and visualizing our experiments in the SOSP paper; please check tag [`sosp-21`](https://github.com/WiscADSL/uFS/tree/sosp-21) and tag [`sosp-21-filebench-config`](https://github.com/WiscADSL/uFS/tree/sosp-21-filebench-config) for details.
+We provide full automation for building, running and visualizing our experiments in the SOSP paper [here](https://github.com/WiscADSL/uFS/tree/sosp-21/cfs_bench/exprs/artifact_eval); please check tag [`sosp-21`](https://github.com/WiscADSL/uFS/tree/sosp-21) and tag [`sosp-21-filebench-config`](https://github.com/WiscADSL/uFS/tree/sosp-21-filebench-config) for details.
 
 We thank the anonymous artifact evaluators for giving us feedback.
 
