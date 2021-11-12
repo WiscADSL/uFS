@@ -37,11 +37,11 @@ the user-level NVMe driver provided by SPDK and the version (18.04) is embeded i
 
 ### Download and Build
 
-Please check this [section](https://github.com/WiscADSL/uFS/tree/main/cfs_bench/exprs/artifact_eval#initialization) in artifact evalution document to setup the environments and install necessary dependencies.
-
-To build uFS, try these:
+Please check this [section](https://github.com/WiscADSL/uFS/tree/main/cfs_bench/exprs/artifact_eval#initialization) in artifact evalution document to *setup the environments* and *install necessary dependencies*.
+Then to build uFS, try these:
 
 ```
+# assume all the dependencies have been installed by artifact_eval.sh
 cd cfs
 mkdir build && cd build
 cmake ..
