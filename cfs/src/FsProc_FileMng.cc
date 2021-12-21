@@ -3553,6 +3553,9 @@ FsPermission::PCR FileMng::checkPermission(FsReq *req) {
                                                   &req->parDirMap,
                                                   &req->parDirInodePtr, &temp);
   if (temp != nullptr) fsWorker_->onTargetInodeFiguredOut(req, temp);
+  if (req->getPathTokens().size() == 1) {
+    req->parDirInodePtr = fsImpl_->root_inode_;
+  }
   return ret;
 }
 
@@ -3562,6 +3565,9 @@ FsPermission::PCR FileMng::checkDstPermission(FsReq *req) {
       req->getDstPathTokens(), {0, 0}, &req->dstParDirMap,
       &req->dstParDirInodePtr, &temp);
   if (temp != nullptr) fsWorker_->onDstTargetInodeFiguredOut(req, temp);
+  if (req->getDstPathTokens().size() == 1) {
+    req->dstParDirInodePtr = fsImpl_->root_inode_;
+  }
   return ret;
 }
 

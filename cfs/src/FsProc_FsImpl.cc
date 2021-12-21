@@ -1267,6 +1267,52 @@ void FsImpl::appendToDir(FsReq *fsReq, InMemInode *dirInode,
       first_byte_inblkoff / (sizeof(struct cfs_dirent)));
 }
 
+int FsImpl::BlockingInitRootInode(FsProcWorker *worker_handler) {
+  bool io_done = false;
+  root_inode_ = BlockingGetInode(ROOTINO, io_done, worker_handler);
+  if (root_inode_ == nullptr) {
+    throw std::runtime_error("cannot fetch root inode");
+  }
+  return 0;
+}
+
+InMemInode *FsImpl::BlockingGetInode(cfs_ino_t ino, bool &io_done,
+                                     FsProcWorker *worker_handler) {
+  auto it = inodeMap_.find(ino);
+  assert(it == inodeMap_.end());
+  if (idx_ != 0 || worker_handler->getWid() != FsProcWorker::kMasterWidConst) {
+    throw std::runtime_error("Secondary attempting to load inode");
+  }
+  int lock_grabbed = BLOCK_BUF_LOCK_GRAB_DEFAULT;
+  bool need_flush = false;
+  auto item =
+      inodeSectorBuf_->getBlock(ino2SectorNo(ino), lock_grabbed, need_flush);
+  assert(!need_flush);
+  if (item == nullptr || (lock_grabbed) != BLOCK_BUF_LOCK_GRAB_YES) {
+    std::runtime_error("Fatal, cannot grab locking for BlockingGetInode");
+  }
+  if (item->isInMem()) {
+    io_done = false;
+    return nullptr;
+  }
+  io_done = true;
+  BlockReq req(ino2SectorNo(ino), nullptr, item->getBufPtr(),
+               FsBlockReqType::READ_BLOCKING_SECTOR);
+  int rt = worker_handler->submitDirectReadDevReq(&req);
+  if (rt < 0) throw std::runtime_error("cannot blocking read sector");
+  item->blockFetchedCallback();
+  auto inode = new InMemInode(ino, worker_handler->getWid());
+  inode->setValid(true);
+  inodeMap_.insert({ino, inode});
+  auto dinode_data = reinterpret_cast<cfs_dinode *>(item->getBufPtr());
+  inode->inodeData = dinode_data;
+#if CFS_JOURNAL(ON)
+  inode->jinodeData = new cfs_dinode(*(inode->inodeData));
+  inode->logEntry = new InodeLogEntry(ino, dinode_data->syncID + 1, inode);
+#endif
+  return inode;
+}
+
 //
 // will NOT hold the lock of the ino's inode
 // @param ino

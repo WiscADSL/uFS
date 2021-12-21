@@ -517,7 +517,13 @@ int FsProcWorker::submitBlkFlushWriteReqCompletion(block_no_t bno,
 }
 
 int FsProcWorker::submitDirectReadDevReq(BlockReq *req) {
-  return dev->blockingRead(req->getBlockNo(), req->getBufPtr());
+  if (req->getReqType() == FsBlockReqType::READ_BLOCKING) {
+    return dev->blockingRead(req->getBlockNo(), req->getBufPtr());
+  } else if (req->getReqType() == FsBlockReqType::READ_BLOCKING_SECTOR) {
+    return dev->blockingReadSector(req->getBlockNo(), req->getBufPtr());
+  } else {
+    throw std::runtime_error("FsBlockReqType not supported");
+  }
 }
 
 int FsProcWorker::submitDirectWriteDevReq(BlockReq *req) {
@@ -2646,6 +2652,8 @@ void FsProcWorkerMaster::workerRunLoop() {
 
   // wakeup servants
   shotServantGunfire();
+
+  fileManager->fsImpl_->BlockingInitRootInode(this);
 
   // we must init tid once this worker is running as a new thread
   workerTid_ = cfsGetTid();

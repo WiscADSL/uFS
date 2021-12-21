@@ -521,6 +521,8 @@ class FsImpl {
 
   int dumpAllInodesToFile(const char *fname);
 
+  int BlockingInitRootInode(FsProcWorker *worker_handle);
+
  private:
   int idx_{-1};
   const FsProcWorker *fsWorker_{nullptr};
@@ -606,6 +608,7 @@ class FsImpl {
   // pointer to the global permission controller
   // Now it also contains the inode ptr
   FsPermission *permission;
+  InMemInode *root_inode_ = nullptr;
 
   // For all the request that based on a path, E.q., mkdir(), rmdir()
   // create, unlink, we need to make sure that if the path is the same,
@@ -622,6 +625,13 @@ class FsImpl {
 
   void initDataBlockAllocNextFreeBlockIdx();
 
+  // Fetch Inode by blocking wait for disk io done
+  // REQUIRED: ino not in inodeMap
+  // @param io_done: if io is performed or not
+  // NOTE: worker_handler as argument though FsImpl has a member "fsWorker_"
+  // because it's better to keep "fsWorker_" as const
+  InMemInode *BlockingGetInode(cfs_ino_t ino, bool &io_done,
+                               FsProcWorker *worker_handler);
   // get inode according to inode number
   // in the normal case, the inode will be fetched from the disk into inodeBuf
   // @param doSubmit: for new-allocated inode, we do not fetch it into memory

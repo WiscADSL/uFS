@@ -79,8 +79,9 @@ class BlkDevSpdk : public BlkDev {
 
   // Read/Write by one sector (512B, SSD's minimal IO size)
   virtual int readSector(uint64_t sectorNo, char *data);
-  int blockingReadSector(uint64_t sectorNo, char *data);
-  int writeSector(uint64_t sectorNo, uint64_t sectorNoSeqNo, char *data);
+  virtual int blockingReadSector(uint64_t sectorNo, char *data);
+  virtual int writeSector(uint64_t sectorNo, uint64_t sectorNoSeqNo,
+                          char *data);
   virtual int blockingWriteSector(uint64_t sectorNo, uint64_t sectorNoSeqNo,
                                   char *data);
   int blockingZeroSectors(uint64_t lba, uint32_t lba_count);

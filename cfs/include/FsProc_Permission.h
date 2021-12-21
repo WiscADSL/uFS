@@ -3,6 +3,7 @@
 
 #include <folly/concurrency/ConcurrentHashMap.h>
 #include <x86intrin.h>
+
 #include <mutex>
 
 class InMemInode;
@@ -37,6 +38,7 @@ class FsPermission {
                       Credential credential, LevelMap** parentMap,
                       InMemInode** parentInode, InMemInode** inode) {
     LevelMap* target = rootMap;
+    if (path.size() == 1) *parentMap = rootMap;
     for (size_t i = 0; i < path.size(); ++i) {
       auto it = target->map.find(path[i]);
       if (it == target->map.end()) {
@@ -60,8 +62,9 @@ class FsPermission {
   // the inode represents a directory
   // The second override is for rename, which already have a MapEntry
   // Returned by a previous deleteEntry
-  bool setPermission(LevelMap* dir, const std::string& path, Credential credential,
-                     InMemInode* inode, LevelMap** dirMap);
+  bool setPermission(LevelMap* dir, const std::string& path,
+                     Credential credential, InMemInode* inode,
+                     LevelMap** dirMap);
 
   bool setPermission(LevelMap* dir, const std::string& path, MapEntry entry,
                      LevelMap** dirMap) {
