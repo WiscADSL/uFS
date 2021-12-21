@@ -58,12 +58,6 @@ We provide full automation for building, running and visualizing our experiments
 
 We thank the anonymous artifact evaluators for giving us feedback.
 
-## Fun Facts
-
-1. You may notice the source code directory is named as `cfs`. Who is cfs? Well, uFS has experienced several iterations, and the version you see is the third one. R.I.P. for our dear version a and b.
-
-2. Actually, version a and version b were not named as afs and bfs. They were called vsfs (very simple filesystem, later also commented by someone as "very stupid filesystem") and uffs (user-level fast filesystem). When the third iteration started, the poor author ran out of the idea of naming, so she decided to name future versions as cfs, dfs, efs, etc., and wished we won't have a ufs version of uFS. Fortunately, cfs survived.
-
 ## Contact
 
 If you have any questions, feel free to open issues at this repository or contact `jingliu [at] cs [dot] wisc [dot] edu` for assistance.
